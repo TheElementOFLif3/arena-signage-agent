@@ -1,263 +1,205 @@
 #!/usr/bin/env python3
 import os
+import json
 import time
 import socket
+from pathlib import Path
 from typing import Optional, List, Dict, Any
 
 import requests
 
 # =====================================================
-# Configuration
+# CONFIG LOADING
 # =====================================================
 
-# You can override this via environment variable ARENASIGNAGE_API_BASE_URL
-API_BASE_URL = os.getenv("ARENASIGNAGE_API_BASE_URL", "http://localhost:8000")
+CONFIG_PATH = Path(__file__).with_name("agent_config.json")
 
-DEVICE_ID = "raspi-001"
-PLAYER_NAME = "Main Entrance Player"
-COUNTRY_CODE = "US"
-CITY = "Chicago"
-ARENA_NAME = "United Center"
-RESOLUTION = "1920x1080"
-NETWORK_TYPE = "ethernet"
+DEFAULT_CONFIG = {
+    "API_BASE_URL": "http://localhost:8000",
+    "DEVICE_ID": "raspi-001",
+    "PLAYER_NAME": "Main Entrance Player",
+    "COUNTRY_CODE": "US",
+    "CITY": "Chicago",
+    "ARENA_NAME": "United Center",
+    "RESOLUTION": "1920x1080",
+    "NETWORK_TYPE": "ethernet",
+    "HEARTBEAT_INTERVAL_SECONDS": 5,
+    "PLAYLIST_REFRESH_INTERVAL_SECONDS": 30,
+}
 
-# Heartbeat interval in seconds
-HEARTBEAT_INTERVAL_SECONDS = 5
 
-# How often to refresh effective playlists (seconds)
-PLAYLIST_REFRESH_INTERVAL_SECONDS = 30
+def ensure_config_exists():
+    """Create default agent_config.json if missing."""
+    if not CONFIG_PATH.exists():
+        with CONFIG_PATH.open("w", encoding="utf-8") as f:
+            json.dump(DEFAULT_CONFIG, f, indent=2)
+
+        print("\n[WARNING] agent_config.json nije postojao — kreiran je default.")
+        print("Molimo pokrenite konfiguraciju:")
+        print("   python3 configure_agent.py\n")
+        exit(1)
+
+
+def load_config() -> Dict[str, Any]:
+    ensure_config_exists()
+
+    try:
+        with CONFIG_PATH.open("r", encoding="utf-8") as f:
+            config = json.load(f)
+    except Exception as e:
+        print(f"[FATAL] Ne mogu da učitam agent_config.json: {e}")
+        exit(1)
+
+    # ENV override (npr. ARENASIGNAGE_API_BASE_URL)
+    api_override = os.getenv("ARENASIGNAGE_API_BASE_URL")
+    if api_override:
+        config["API_BASE_URL"] = api_override
+
+    return config
 
 
 # =====================================================
-# Helpers
+# UTIL FUNKCIJE
 # =====================================================
 
 def get_cpu_temperature() -> Optional[int]:
-    """
-    Try to read CPU temperature in °C from Linux sysfs.
+    """Read CPU temp on Linux."""
 
-    On non-Raspberry Pi systems (e.g. macOS, dev machines) this will
-    usually fail and return None.
-    """
     try:
         with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
             milli_c = int(f.read().strip())
-            return int(milli_c / 1000)
-    except Exception:
+            return milli_c // 1000
+    except:
         return None
 
 
-def detect_network_type() -> str:
-    """
-    Simple placeholder to detect network type.
-
-    For now this just returns the configured NETWORK_TYPE constant.
-    Later this could inspect interfaces (eth0, wlan0, etc.).
-    """
-    return NETWORK_TYPE
+def detect_network_type(cfg: dict) -> str:
+    return cfg.get("NETWORK_TYPE", "ethernet")
 
 
-def api_get(path: str, **kwargs) -> requests.Response:
-    """
-    Small helper for GET requests to the backend.
-    """
-    url = f"{API_BASE_URL}{path}"
-    return requests.get(url, timeout=5, **kwargs)
+def api_get(base: str, path: str, **kwargs):
+    return requests.get(base + path, timeout=5, **kwargs)
 
 
-def api_post(path: str, json: dict | None = None, **kwargs) -> requests.Response:
-    """
-    Small helper for POST requests to the backend.
-    """
-    url = f"{API_BASE_URL}{path}"
-    return requests.post(url, json=json, timeout=5, **kwargs)
+def api_post(base: str, path: str, json=None, **kwargs):
+    return requests.post(base + path, json=json, timeout=5, **kwargs)
 
 
 # =====================================================
-# Player registration + heartbeats
+# PLAYER LOGIKA
 # =====================================================
 
-def register_player() -> int:
-    """
-    Ensure this device is registered as a Player in the backend.
+def register_player(cfg: dict) -> int:
+    base = cfg["API_BASE_URL"]
 
-    1. Fetch all players from /players/
-    2. If a player with our DEVICE_ID exists, reuse its id
-    3. Otherwise create a new player via POST /players/
-    """
     try:
-        resp = api_get("/players/")
+        resp = api_get(base, "/players/")
         resp.raise_for_status()
     except Exception as e:
-        raise RuntimeError(f"Failed to query players from backend: {e}") from e
+        raise RuntimeError(f"Failed to query players: {e}") from e
 
-    players: List[Dict[str, Any]] = resp.json()
+    players = resp.json()
 
+    # Da li već postoji?
     for p in players:
-        if p.get("device_id") == DEVICE_ID:
-            print(f"[INFO] Found existing player with id={p['id']}")
-            return int(p["id"])
+        if p["device_id"] == cfg["DEVICE_ID"]:
+            print(f"[INFO] Found existing player id={p['id']}")
+            return p["id"]
 
+    # Nema → kreiraj
     payload = {
-        "device_id": DEVICE_ID,
-        "name": PLAYER_NAME,
-        "country_code": COUNTRY_CODE,
-        "city": CITY,
-        "arena_name": ARENA_NAME,
-        "resolution": RESOLUTION,
-        "network_type": detect_network_type(),
+        "device_id": cfg["DEVICE_ID"],
+        "name": cfg["PLAYER_NAME"],
+        "country_code": cfg["COUNTRY_CODE"],
+        "city": cfg["CITY"],
+        "arena_name": cfg["ARENA_NAME"],
+        "resolution": cfg["RESOLUTION"],
+        "network_type": detect_network_type(cfg),
         "temperature_c": get_cpu_temperature(),
         "is_online": True,
     }
 
     print("[INFO] Creating new player...")
     try:
-        resp = api_post("/players/", json=payload)
+        resp = api_post(base, "/players/", json=payload)
         resp.raise_for_status()
     except Exception as e:
-        raise RuntimeError(f"Failed to create player in backend: {e}") from e
+        raise RuntimeError(f"Failed to create player: {e}") from e
 
     created = resp.json()
-    print(f"[INFO] Created player with id={created['id']}")
-    return int(created["id"])
+    print(f"[INFO] Created new player id={created['id']}")
+    return created["id"]
 
 
-def send_heartbeat(player_id: int) -> None:
-    """
-    Send periodic heartbeat to backend.
+def send_heartbeat(cfg: dict, player_id: int):
+    base = cfg["API_BASE_URL"]
 
-    Endpoint: POST /players/{player_id}/heartbeat
-    Payload:
-      - temperature_c  (°C)
-      - is_online      (always True for now)
-      - network_type   (wifi/ethernet/etc.)
-    """
     payload = {
         "temperature_c": get_cpu_temperature(),
+        "network_type": detect_network_type(cfg),
         "is_online": True,
-        "network_type": detect_network_type(),
     }
 
     try:
-        resp = api_post(f"/players/{player_id}/heartbeat", json=payload)
+        resp = api_post(base, f"/players/{player_id}/heartbeat", json=payload)
         resp.raise_for_status()
-        data = resp.json()
-        print(
-            f"[HB] Player {data['id']} OK | "
-            f"online={data['is_online']} | "
-            f"temp={data.get('temperature_c')}°C"
-        )
+        info = resp.json()
+        print(f"[HB] Player {info['id']} | temp={info.get('temperature_c')}°C")
     except Exception as e:
         print(f"[ERROR] Heartbeat failed: {e}")
 
 
-# =====================================================
-# Effective playlists (read-only from agent perspective)
-# =====================================================
+def fetch_effective_playlists(cfg: dict, player_id: int):
+    base = cfg["API_BASE_URL"]
 
-def fetch_effective_playlists(player_id: int) -> Dict[str, Any] | None:
-    """
-    Fetch the effective playlists for this player.
-
-    Endpoint:
-      GET /playlists/effective/by-player/{player_id}
-
-    Expected JSON shape (based on schemas):
-      {
-        "player_id": int,
-        "group_id": int | null,
-        "entries": [
-          {
-            "playlist_id": int,
-            "playlist_name": str,
-            "source": "player" | "group",
-            "link_id": int,
-            "order_index": int,
-            "is_active": bool,
-            "items": [
-              {
-                "id": int,
-                "playlist_id": int,
-                "title": str | null,
-                "media_url": str,
-                "duration_seconds": int | null,
-                "order_index": int
-              },
-              ...
-            ]
-          },
-          ...
-        ]
-      }
-
-    For now we only log the data. Later this will drive real playback logic.
-    """
     try:
-        resp = api_get(f"/playlists/effective/by-player/{player_id}")
+        resp = api_get(base, f"/playlists/effective/by-player/{player_id}")
         if resp.status_code == 404:
-            print("[INFO] No effective playlists for this player yet.")
-            return None
+            print("[INFO] No playlist yet.")
+            return
         resp.raise_for_status()
     except Exception as e:
-        print(f"[ERROR] Failed to fetch effective playlists for player {player_id}: {e}")
-        return None
-
-    data: Dict[str, Any] = resp.json()
-    entries: List[Dict[str, Any]] = data.get("entries", [])
-
-    if not entries:
-        print("[INFO] Effective playlist is empty for this player.")
-        return data
-
-    print(
-        f"[INFO] Effective playlists for player {data.get('player_id')} "
-        f"(group_id={data.get('group_id')}): {len(entries)} entrie(s)"
-    )
-
-    for entry in entries:
-        src = entry.get("source")
-        pl_name = entry.get("playlist_name", "<unnamed>")
-        order_index = entry.get("order_index", 0)
-        items = entry.get("items", [])
-        print(
-            f"       - [{src}] '{pl_name}' order={order_index} items={len(items)}"
-        )
-
-    return data
-
-
-# =====================================================
-# Main loop
-# =====================================================
-
-def main() -> None:
-    print("[INFO] ArenaSignage Pi agent starting...")
-    print(f"[INFO] Hostname: {socket.gethostname()}")
-    print(f"[INFO] Backend: {API_BASE_URL}")
-
-    try:
-        player_id = register_player()
-    except RuntimeError as e:
-        print(f"[FATAL] Could not register player: {e}")
+        print(f"[ERROR] Playlist fetch failed: {e}")
         return
 
-    print(f"[INFO] Using player_id={player_id}")
+    data = resp.json()
+    entries = data.get("entries", [])
+    print(f"[INFO] Effective playlist entries={len(entries)}")
+    for e in entries:
+        print(f"   - {e.get('playlist_name')} ({len(e.get('items', []))} items)")
 
-    # Initial effective playlist fetch (for debugging / inspection)
-    fetch_effective_playlists(player_id)
 
-    last_playlist_refresh = time.time()
+# =====================================================
+# MAIN
+# =====================================================
+
+def main():
+    cfg = load_config()
+
+    print("[INFO] ArenaSignage Agent")
+    print(f"[INFO] Host: {socket.gethostname()}")
+    print(f"[INFO] API:  {cfg['API_BASE_URL']}")
+
+    # Register or find player
+    try:
+        player_id = register_player(cfg)
+    except RuntimeError as e:
+        print(f"[FATAL] {e}")
+        return
+
+    print(f"[INFO] Active player_id={player_id}")
+    fetch_effective_playlists(cfg, player_id)
+
+    last_refresh = time.time()
 
     while True:
-        send_heartbeat(player_id)
+        send_heartbeat(cfg, player_id)
 
-        # Periodically refresh effective playlists
-        now = time.time()
-        if now - last_playlist_refresh >= PLAYLIST_REFRESH_INTERVAL_SECONDS:
-            fetch_effective_playlists(player_id)
-            last_playlist_refresh = now
+        if time.time() - last_refresh >= cfg["PLAYLIST_REFRESH_INTERVAL_SECONDS"]:
+            fetch_effective_playlists(cfg, player_id)
+            last_refresh = time.time()
 
-        time.sleep(HEARTBEAT_INTERVAL_SECONDS)
+        time.sleep(cfg["HEARTBEAT_INTERVAL_SECONDS"])
 
 
 if __name__ == "__main__":
