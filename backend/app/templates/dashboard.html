@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>ArenaSignage – Player Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <style>
+        /* --------------
+           Global styles
+           -------------- */
+        :root {
+            --bg: #0f172a;
+            --bg-card: #111827;
+            --bg-table-header: #020617;
+            --border: #1f2937;
+            --text: #e5e7eb;
+            --text-muted: #9ca3af;
+            --accent: #3b82f6;
+            --accent-soft: rgba(59,130,246,0.15);
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #eab308;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+                         "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #111827, #020617 55%);
+            color: var(--text);
+        }
+
+        .page {
+            min-height: 100vh;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        /* --------------
+           Header
+           -------------- */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .title-block h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 0.03em;
+        }
+
+        .title-block p {
+            margin: 4px 0 0;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pill {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(15,23,42,0.8);
+            color: var(--text-muted);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(34,197,94,0.8);
+        }
+
+        .btn {
+            border-radius: 999px;
+            padding: 6px 14px;
+            border: 1px solid var(--accent);
+            background: var(--accent-soft);
+            color: var(--text);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        /* --------------
+           Card + table
+           -------------- */
+        .card {
+            background: linear-gradient(145deg, rgba(15,23,42,0.98), #020617);
+            border-radius: 16px;
+            border: 1px solid rgba(31,41,55,0.9);
+            box-shadow:
+                0 18px 35px rgba(15,23,42,0.95),
+                0 0 0 1px rgba(15,23,42,0.9);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .card-header span {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .card-body {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 750px;
+        }
+
+        thead {
+            background: var(--bg-table-header);
+        }
+
+        thead th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            text-align: left;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            background: var(--bg-card);
+            border-bottom: 1px solid rgba(31,41,55,0.8);
+        }
+
+        tbody tr:nth-child(even) {
+            background: #020617;
+        }
+
+        tbody td {
+            padding: 9px 12px;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: rgba(15,23,42,0.9);
+        }
+
+        .small {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* --------------
+           Badges
+           -------------- */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+        }
+
+        .badge-online {
+            background: rgba(22,163,74,0.15);
+            color: var(--success);
+        }
+
+        .badge-online .badge-dot {
+            background: var(--success);
+            box-shadow: 0 0 8px rgba(34,197,94,0.7);
+        }
+
+        .badge-offline {
+            background: rgba(127,29,29,0.3);
+            color: var(--danger);
+        }
+
+        .badge-offline .badge-dot {
+            background: var(--danger);
+        }
+
+        .badge-net {
+            background: rgba(37,99,235,0.15);
+            color: var(--accent);
+        }
+
+        .temp-ok {
+            color: var(--success);
+        }
+
+        .temp-warn {
+            color: var(--warning);
+        }
+
+        .temp-hot {
+            color: var(--danger);
+        }
+
+        /* --------------
+           Footer
+           -------------- */
+        .footer {
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                padding: 16px;
+            }
+            .header {
+                align-items: flex-start;
+            }
+            .controls {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="title-block">
+                <h1>ArenaSignage – Player Dashboard</h1>
+                <p>Live status of all registered Raspberry Pi / signage players.</p>
+            </div>
+
+            <div class="controls">
+                <div class="pill">
+                    <span class="pill-dot"></span>
+                    <span id="summary-text">
+                        <!-- Filled by JS -->
+                        Loading status…
+                    </span>
+                </div>
+                <button id="refresh-btn" class="btn">
+                    Refresh now
+                </button>
+            </div>
+        </header>
+
+        <!-- Card + Table -->
+        <section class="card">
+            <div class="card-header">
+                <div>
+                    <h2>Players</h2>
+                    <span>Compact status view (online state, temperature, network, last seen)</span>
+                </div>
+                <span class="small" id="last-refresh-label">
+                    <!-- Filled by JS -->
+                </span>
+            </div>
+
+            <div class="card-body">
+                <table id="players-table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Player</th>
+                        <th>Status</th>
+                        <th>Temperature</th>
+                        <th>Local weather</th>
+                        <th>Network</th>
+                        <th>Last Seen (UTC)</th>
+                        <th>Location</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {# Initial render from server-side `players` list (will be
+                       overwritten by JS after first refresh, so keep it simple) #}
+                    {% for p in players %}
+                        <tr>
+                            <td>{{ p.id }}</td>
+                            <td>
+                                <div>{{ p.name }}</div>
+                                <div class="small">{{ p.device_id }}</div>
+                            </td>
+                            <td>
+                                {% if p.is_online %}
+                                    <span class="badge badge-online">
+                                        <span class="badge-dot"></span>
+                                        Online
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-offline">
+                                        <span class="badge-dot"></span>
+                                        Offline
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if p.temperature_c is not none %}
+                                    {% set temp_c = p.temperature_c %}
+                                    {% set temp_val = temp_c %}
+                                    {% set unit = "C" %}
+
+                                    {% if p.country and p.country.uses_fahrenheit %}
+                                        {% set temp_val = (temp_c * 9 / 5) + 32 %}
+                                        {% set unit = "F" %}
+                                    {% endif %}
+
+                                    {% if temp_c < 55 %}
+                                        {% set temp_class = "temp-ok" %}
+                                    {% elif temp_c < 70 %}
+                                        {% set temp_class = "temp-warn" %}
+                                    {% else %}
+                                        {% set temp_class = "temp-hot" %}
+                                    {% endif %}
+
+                                    <span class="{{ temp_class }}">
+                                        {{ temp_val | round(0, 'floor') }}°{{ unit }}
+                                    </span>
+                                {% else %}
+                                    <span class="small">n/a</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="small">loading…</span>
+                            </td>
+                            <td>
+                                {% if p.network_type %}
+                                    <span class="badge badge-net">{{ p.network_type }}</span>
+                                {% else %}
+                                    <span class="small">unknown</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if p.last_seen %}
+                                    <span class="small">{{ p.last_seen.isoformat() }}</span>
+                                {% else %}
+                                    <span class="small">never</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if p.city or p.arena_name %}
+                                    <div class="small">
+                                        {{ p.city or "Unknown city" }}
+                                        {% if p.arena_name %} – {{ p.arena_name }}{% endif %}
+                                    </div>
+                                {% else %}
+                                    <span class="small">n/a</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <span>
+                Data source: <code>/players/status</code> endpoint
+                (°C or °F depending on country) + <code>/players/&lt;id&gt;/weather</code>
+            </span>
+            <span id="auto-refresh-label">
+                Auto-refresh: every 5 seconds
+            </span>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // --------------------------
+    // Utility: format last refresh time
+    // --------------------------
+    function formatTime(date) {
+        const pad = (n) => n.toString().padStart(2, "0");
+        return (
+            date.getUTCHours().toString().padStart(2, "0") + ":" +
+            pad(date.getUTCMinutes()) + ":" +
+            pad(date.getUTCSeconds()) + " UTC"
+        );
+    }
+
+    // --------------------------
+    // Apply temperature color class (based on °C)
+    // --------------------------
+    function getTempClass(tempC) {
+        if (tempC === null || tempC === undefined) return "";
+        if (tempC < 55) return "temp-ok";
+        if (tempC < 70) return "temp-warn";
+        return "temp-hot";
+    }
+
+    // --------------------------
+    // Fetch local weather for a single player
+    // --------------------------
+    async function fetchPlayerWeather(player, cell) {
+        // Ako nemamo grad ili državu – nema prognoze
+        if (!player.city || !player.country_code) {
+            cell.innerHTML = `<span class="small">n/a</span>`;
+            return;
+        }
+
+        cell.innerHTML = `<span class="small">loading…</span>`;
+
+        try {
+            const resp = await fetch(`/players/${player.id}/weather`);
+            if (!resp.ok) {
+                throw new Error("HTTP " + resp.status);
+            }
+
+            const data = await resp.json();
+            const w = data.weather || {};
+
+            const temp = w.temp_display;
+            const unit = w.temp_unit || "C";
+
+            if (temp === null || temp === undefined) {
+                cell.innerHTML = `<span class="small">n/a</span>`;
+                return;
+            }
+
+            // Ako kasnije dodaš opis u weather_service, ovde ga možeš prikazati
+            const labelParts = [];
+            labelParts.push(`${temp}°${unit}`);
+            if (data.city) {
+                labelParts.push(data.city);
+            }
+
+            cell.innerHTML = `<div class="small">${labelParts.join(" – ")}</div>`;
+        } catch (err) {
+            console.error("Failed to load weather for player", player.id, err);
+            cell.innerHTML = `<span class="small">n/a</span>`;
+        }
+    }
+
+    // --------------------------
+    // Render table rows from JSON
+    // --------------------------
+    function renderPlayers(players) {
+        const tbody = document.querySelector("#players-table tbody");
+        tbody.innerHTML = "";
+
+        let onlineCount = 0;
+
+        players.forEach((p) => {
+            const tr = document.createElement("tr");
+
+            if (p.is_online) onlineCount++;
+
+            // ID
+            const tdId = document.createElement("td");
+            tdId.textContent = p.id;
+            tr.appendChild(tdId);
+
+            // Player (name + device_id)
+            const tdPlayer = document.createElement("td");
+            tdPlayer.innerHTML = `
+                <div>${p.name}</div>
+                <div class="small">${p.device_id}</div>
+            `;
+            tr.appendChild(tdPlayer);
+
+            // Status badge
+            const tdStatus = document.createElement("td");
+            if (p.is_online) {
+                tdStatus.innerHTML = `
+                    <span class="badge badge-online">
+                        <span class="badge-dot"></span>
+                        Online
+                    </span>
+                `;
+            } else {
+                tdStatus.innerHTML = `
+                    <span class="badge badge-offline">
+                        <span class="badge-dot"></span>
+                        Offline
+                    </span>
+                `;
+            }
+            tr.appendChild(tdStatus);
+
+            // Temperature with °C / °F depending on uses_fahrenheit flag
+            const tdTemp = document.createElement("td");
+            if (p.temperature_c !== null && p.temperature_c !== undefined) {
+                const tempC = p.temperature_c;
+                const tempClass = getTempClass(tempC);
+
+                let displayTemp = tempC;
+                let unit = "°C";
+
+                const usesF = !!p.uses_fahrenheit;
+                if (usesF) {
+                    displayTemp = Math.round(tempC * 9 / 5 + 32);
+                    unit = "°F";
+                }
+
+                tdTemp.innerHTML = `<span class="${tempClass}">${displayTemp}${unit}</span>`;
+            } else {
+                tdTemp.innerHTML = `<span class="small">n/a</span>`;
+            }
+            tr.appendChild(tdTemp);
+
+            // Local weather (from /players/<id>/weather)
+            const tdWeather = document.createElement("td");
+            tdWeather.innerHTML = `<span class="small">loading…</span>`;
+            tr.appendChild(tdWeather);
+
+            // Network
+            const tdNet = document.createElement("td");
+            if (p.network_type) {
+                tdNet.innerHTML = `
+                    <span class="badge badge-net">${p.network_type}</span>
+                `;
+            } else {
+                tdNet.innerHTML = `<span class="small">unknown</span>`;
+            }
+            tr.appendChild(tdNet);
+
+            // Last seen
+            const tdLast = document.createElement("td");
+            if (p.last_seen) {
+                tdLast.innerHTML = `<span class="small">${p.last_seen}</span>`;
+            } else {
+                tdLast.innerHTML = `<span class="small">never</span>`;
+            }
+            tr.appendChild(tdLast);
+
+            // Location (city + arena)
+            const tdLoc = document.createElement("td");
+            const city = p.city || "Unknown city";
+            const arena = p.arena_name ? " – " + p.arena_name : "";
+            if (p.city || p.arena_name) {
+                tdLoc.innerHTML = `<div class="small">${city}${arena}</div>`;
+            } else {
+                tdLoc.innerHTML = `<span class="small">n/a</span>`;
+            }
+            tr.appendChild(tdLoc);
+
+            tbody.appendChild(tr);
+
+            // Nakon što je red dodat u tabelu – povuci lokalnu prognozu
+            fetchPlayerWeather(p, tdWeather);
+        });
+
+        const summary = document.getElementById("summary-text");
+        summary.textContent = `Players online: ${onlineCount} / ${players.length}`;
+    }
+
+    // --------------------------
+    // Fetch status from /players/status
+    // --------------------------
+    async function refreshStatus() {
+        const btn = document.getElementById("refresh-btn");
+
+        try {
+            btn.disabled = true;
+            btn.textContent = "Refreshing…";
+
+            const resp = await fetch("/players/status");
+            if (!resp.ok) {
+                throw new Error("HTTP " + resp.status);
+            }
+            const data = await resp.json();
+            renderPlayers(data);
+
+            const now = new Date();
+            document.getElementById("last-refresh-label").textContent =
+                "Last refresh: " + formatTime(now);
+        } catch (err) {
+            console.error("Failed to refresh player status:", err);
+            document.getElementById("summary-text").textContent =
+                "Error loading player status";
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Refresh now";
+        }
+    }
+
+    // Initial auto-refresh label
+    document.getElementById("auto-refresh-label").textContent =
+        "Auto-refresh: every 5 seconds";
+
+    // Initial manual refresh button
+    document.getElementById("refresh-btn").addEventListener("click", refreshStatus);
+
+    // Auto-refresh every 5 seconds
+    setInterval(refreshStatus, 5000);
+
+    // Do one refresh on page load (to normalize format)
+    window.addEventListener("load", refreshStatus);
+</script>
+</body>
+</html>
