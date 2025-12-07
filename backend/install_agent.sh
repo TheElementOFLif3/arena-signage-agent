@@ -1,51 +1,62 @@
 #!/usr/bin/env bash
 set -e
 
-echo "=== ArenaSignage Agent installer ==="
+echo "== ArenaSignage Agent installer =="
 
-# 1. Install Python & tools if missing (Debian/Ubuntu style)
+# Always work from the directory where this script lives
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+
+echo "[INFO] Script directory: $SCRIPT_DIR"
+
+# --- Ensure system packages ---------------------------------------------------
+
 if ! command -v python3 >/dev/null 2>&1; then
-  echo "[INFO] Python3 not found, installing..."
-  sudo apt-get update
-  sudo apt-get install -y python3 python3-venv python3-pip
-else
-  echo "[INFO] Python3 found: $(python3 --version)"
+  echo "[INFO] Installing python3..."
+  sudo apt update
+  sudo apt install -y python3
+fi
+
+if ! dpkg -s python3-venv >/dev/null 2>&1; then
+  echo "[INFO] Installing python3-venv..."
+  sudo apt update
+  sudo apt install -y python3-venv
 fi
 
 if ! command -v git >/dev/null 2>&1; then
-  echo "[INFO] git not found, installing..."
-  sudo apt-get update
-  sudo apt-get install -y git
+  echo "[INFO] Installing git..."
+  sudo apt update
+  sudo apt install -y git
 fi
 
-# 2. Go to backend directory where pi_agent.py lives
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR/backend"
+# --- Create virtual environment ----------------------------------------------
 
-# 3. Create virtualenv if not exists
+echo "[INFO] Python version:"
+python3 --version
+
 if [ ! -d "venv" ]; then
-  echo "[INFO] Creating Python virtualenv..."
+  echo "[INFO] Creating virtual environment..."
   python3 -m venv venv
+else
+  echo "[INFO] Reusing existing virtual environment (venv/)."
 fi
 
-# 4. Activate venv and install requirements
-echo "[INFO] Activating virtualenv..."
-# shellcheck source=/dev/null
+# shellcheck disable=SC1091
 source venv/bin/activate
 
-echo "[INFO] Installing Python dependencies..."
+echo "[INFO] Upgrading pip and installing Python dependencies..."
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 5. Run configuration menu
 echo
-echo "[INFO] Running agent configuration..."
-python3 configure_agent.py
-
+echo "[OK] Installation complete."
+echo "To configure the agent run:"
+echo "  cd \"$SCRIPT_DIR\""
+echo "  source venv/bin/activate"
+echo "  python3 configure_agent.py"
 echo
-echo "=== Installation finished ==="
-echo "To start the agent manually, run:"
-echo "  cd \"$SCRIPT_DIR/backend\""
+echo "To start the agent:"
+echo "  cd \"$SCRIPT_DIR\""
 echo "  source venv/bin/activate"
 echo "  python3 pi_agent.py"
 echo

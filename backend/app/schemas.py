@@ -157,10 +157,10 @@ class PlaylistItemBase(BaseModel):
 
     A playlist item represents a single media slide (image, video, HTML page, etc.).
     """
-    title: Optional[str] = None           # Human readable title
-    media_url: str                        # Path/URL to media asset
-    duration_seconds: Optional[int] = None  # How long to show this item
-    order_index: int = 0                  # Order inside the playlist (0,1,2,...)
+    title: Optional[str] = None              # Human readable title
+    media_url: str                           # Path/URL to media asset
+    duration_seconds: Optional[int] = None   # How long to show this item
+    order_index: int = 0                     # Order inside the playlist (0,1,2,...)
 
 
 class PlaylistItemCreate(PlaylistItemBase):
@@ -355,6 +355,7 @@ class GroupPlaylistRead(GroupPlaylistBase):
     class Config:
         from_attributes = True
 
+
 # =====================================================
 # Effective playlist for a player
 # =====================================================
@@ -398,4 +399,65 @@ class EffectivePlaylistResponse(BaseModel):
     entries: List[EffectivePlaylistEntry] = []
 
     class Config:
-        from_attributes = True        
+        from_attributes = True
+
+
+# =====================================================
+# Player-facing playlist package for offline agents
+# =====================================================
+class PlaylistItemForPlayer(BaseModel):
+    """
+    Lightweight playlist item structure sent to the player agent.
+
+    This structure is optimized for offline playback and caching:
+      - media_url: final URL that the agent should download and cache
+      - checksum: optional integrity check (hash, md5, sha256, etc.)
+      - valid_from / valid_until: optional time window when the item is allowed
+    """
+    id: Optional[int] = None
+    playlist_id: Optional[int] = None
+
+    position: Optional[int] = 0
+    media_type: Optional[str] = None
+
+    duration_seconds: int
+    media_url: str
+
+    checksum: Optional[str] = None
+
+    valid_from: Optional[datetime] = None
+    valid_until: Optional[datetime] = None
+
+
+class PlayerPlaylistPackage(BaseModel):
+    """
+    Complete playlist package for a single player, used by the offline agent.
+
+    The player agent is expected to:
+      - call the playlist endpoint
+      - download/cache all media URLs
+      - verify checksums if provided
+      - store this package (JSON) locally as the current active playlist
+    """
+    player_id: int
+    player_device_id: str
+
+    playlist_id: Optional[int] = None
+    playlist_name: Optional[str] = None
+    playlist_updated_at: Optional[datetime] = None
+
+    # Optional timezone information for local scheduling on the agent
+    timezone: Optional[str] = None
+
+    # Flat list of items to play in order
+    items: List[PlaylistItemForPlayer]
+    # =====================================================
+# Player active playlist assignment
+# =====================================================
+class PlayerSetActivePlaylistRequest(BaseModel):
+    """
+    Payload used to set or clear the active playlist for a player.
+
+    - playlist_id: target playlist id, or null to clear the active playlist.
+    """
+    playlist_id: Optional[int] = None

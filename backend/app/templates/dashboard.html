@@ -2,25 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>ArenaSignage – Player Dashboard</title>
+    <title>ArenaSignage – Control Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- macOS App Store style – dark glass -->
     <style>
-        /* --------------
-           Global styles
-           -------------- */
+        /* ---------------------------
+           GLOBAL THEME (dark Apple style)
+        ---------------------------- */
         :root {
-            --bg: #0f172a;
-            --bg-card: #111827;
-            --bg-table-header: #020617;
-            --border: #1f2937;
-            --text: #e5e7eb;
+            --bg: #050509;
+            --bg-elevated: #111118;
+            --bg-elevated-soft: #151520;
+            --bg-sidebar: #08080f;
+            --bg-card: rgba(18,18,26,0.98);
+            --bg-card-alt: rgba(25,25,36,0.98);
+            --bg-header: rgba(28,28,40,0.96);
+
+            --border: rgba(255,255,255,0.06);
+            --border-soft: rgba(255,255,255,0.03);
+
+            --text: #f9fafb;
             --text-muted: #9ca3af;
-            --accent: #3b82f6;
-            --accent-soft: rgba(59,130,246,0.15);
-            --danger: #ef4444;
-            --success: #22c55e;
-            --warning: #eab308;
+
+            --accent: #0a84ff;
+            --accent-soft: rgba(10,132,255,0.25);
+
+            --success: #34c759;
+            --danger: #ff453a;
+            --warning: #ffd60a;
         }
 
         * {
@@ -29,104 +39,339 @@
 
         body {
             margin: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
                          "Segoe UI", sans-serif;
-            background: radial-gradient(circle at top, #111827, #020617 55%);
+            background:
+                radial-gradient(circle at top, #1a1a24 0%, #050509 45%, #020206 100%);
             color: var(--text);
+            -webkit-font-smoothing: antialiased;
         }
 
         .page {
             min-height: 100vh;
-            padding: 24px;
+            padding: 18px;
             display: flex;
             justify-content: center;
         }
 
-        .container {
+        .shell {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1400px;
+            border-radius: 26px;
+            overflow: hidden;
+
+            background: radial-gradient(circle at top left,#151521,#050509 45%,#050509 100%);
+            box-shadow:
+                0 40px 90px rgba(0,0,0,0.85),
+                0 0 0 1px rgba(255,255,255,0.05);
+            display: flex;
         }
 
-        /* --------------
-           Header
-           -------------- */
+        /* ---------------------------
+           SIDEBAR (left)
+        ---------------------------- */
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(180deg,#080811,#050509);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            flex-direction: column;
+            padding: 12px 10px;
+            backdrop-filter: blur(26px);
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 10px 10px 10px;
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .window-dot { width: 10px; height: 10px; border-radius: 999px; }
+        .red { background: #ff5f57; }
+        .yellow { background: #febc2e; }
+        .green { background: #28c840; }
+
+        .sidebar-app-name {
+            margin-left: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .sidebar-search {
+            margin: 8px 8px 12px 8px;
+        }
+
+        .sidebar-search input {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(15,15,24,0.9);
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .sidebar-search input::placeholder {
+            color: rgba(148,163,184,0.8);
+        }
+
+        .sidebar-section-title {
+            padding: 4px 14px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: rgba(148,163,184,0.8);
+        }
+
+        .sidebar-nav {
+            padding: 4px 4px 8px 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .nav-tab {
+            border-radius: 12px;
+            border: 1px solid transparent;
+            padding: 7px 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.12s ease-out;
+        }
+
+        .nav-tab span.label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tab span.dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: rgba(148,163,184,0.6);
+        }
+
+        .nav-tab:hover {
+            background: rgba(31,41,55,0.55);
+        }
+
+        .nav-tab-active {
+            background: radial-gradient(circle at top left,#2563eb,#0b172a);
+            color: #e5f0ff;
+            border-color: rgba(129,140,248,0.9);
+            box-shadow:
+                0 12px 25px rgba(37,99,235,0.55),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
+        }
+
+        .nav-tab-active span.dot {
+            background: #60a5fa;
+            box-shadow: 0 0 12px rgba(56,189,248,0.9);
+        }
+
+        .nav-tab-disabled {
+            opacity: 0.35;
+            cursor: default;
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            background: linear-gradient(135deg,#f97316,#ec4899);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            box-shadow: 0 0 12px rgba(236,72,153,0.9);
+        }
+
+        .sidebar-user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-user-info span.name {
+            font-size: 12px;
+        }
+        .sidebar-user-info span.role {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* ---------------------------
+           MAIN AREA (right)
+        ---------------------------- */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 14px 18px 14px 14px;
+            background: radial-gradient(circle at top,#151521,#050509 55%);
+        }
+
+        .top-strip {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .top-strip span.pill {
+            padding: 3px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.3);
+            background: rgba(15,23,42,0.7);
+        }
+
         .header {
             display: flex;
-            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 14px;
             gap: 12px;
-            margin-bottom: 20px;
         }
 
         .title-block h1 {
             margin: 0;
             font-size: 24px;
-            letter-spacing: 0.03em;
         }
 
         .title-block p {
             margin: 4px 0 0;
-            font-size: 14px;
             color: var(--text-muted);
+            font-size: 13px;
         }
 
         .controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .pill {
-            font-size: 12px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid var(--border);
-            background: rgba(15,23,42,0.8);
-            color: var(--text-muted);
-            display: inline-flex;
+        .pill-status {
+            display: flex;
             align-items: center;
             gap: 6px;
+            padding: 4px 9px;
+            font-size: 11px;
+
+            border-radius: 999px;
+            background: rgba(17,24,39,0.9);
+            border: 1px solid var(--border-soft);
+
+            box-shadow:
+                0 0 0 1px rgba(15,23,42,0.9),
+                0 8px 18px rgba(0,0,0,0.65);
         }
 
         .pill-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 999px;
+            width: 8px;
+            height: 8px;
             background: var(--success);
-            box-shadow: 0 0 8px rgba(34,197,94,0.8);
+            border-radius: 999px;
+            box-shadow: 0 0 8px rgba(52,199,89,0.9);
         }
 
         .btn {
+            padding: 6px 16px;
             border-radius: 999px;
-            padding: 6px 14px;
-            border: 1px solid var(--accent);
-            background: var(--accent-soft);
-            color: var(--text);
+            border: 1px solid rgba(96,165,250,0.9);
+            background: radial-gradient(circle at top,#3b82f6,#0b1120);
+            color: #e5f0ff;
+            font-weight: 500;
             font-size: 13px;
             cursor: pointer;
+
+            box-shadow:
+                0 14px 28px rgba(37,99,235,0.7),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
+
+            transition: 0.1s;
         }
 
+        .btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+        }
+        .btn:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow:
+                0 8px 16px rgba(15,23,42,0.9),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
+        }
         .btn:disabled {
             opacity: 0.6;
             cursor: default;
         }
 
-        /* --------------
-           Card + table
-           -------------- */
-        .card {
-            background: linear-gradient(145deg, rgba(15,23,42,0.98), #020617);
-            border-radius: 16px;
-            border: 1px solid rgba(31,41,55,0.9);
+        .btn-secondary {
+            padding: 5px 13px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.35);
+            background: rgba(15,23,42,0.9);
+            color: var(--text);
+            font-size: 12px;
+            cursor: pointer;
             box-shadow:
-                0 18px 35px rgba(15,23,42,0.95),
-                0 0 0 1px rgba(15,23,42,0.9);
+                0 8px 18px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: rgba(30,64,175,0.65);
+            border-color: rgba(129,140,248,0.8);
+        }
+
+        .btn-secondary:disabled {
+            opacity: 0.55;
+            cursor: default;
+        }
+
+        /* ---------------------------
+           CARDS
+        ---------------------------- */
+        .card {
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: radial-gradient(circle at top,var(--bg-card),var(--bg-card-alt));
+            box-shadow:
+                0 24px 50px rgba(0,0,0,0.85),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
             overflow: hidden;
+            backdrop-filter: blur(26px);
+        }
+
+        .card + .card {
+            margin-top: 14px;
         }
 
         .card-header {
-            padding: 14px 18px;
+            padding: 12px 18px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
@@ -140,7 +385,7 @@
         }
 
         .card-header span {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
         }
 
@@ -148,64 +393,59 @@
             overflow-x: auto;
         }
 
+        /* Tables */
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 750px;
+            min-width: 800px;
         }
 
         thead {
-            background: var(--bg-table-header);
+            background: rgba(15,23,42,0.9);
         }
 
-        thead th {
-            font-size: 11px;
+        th {
+            padding: 10px 13px;
+            font-size: 10px;
             text-transform: uppercase;
+            color: rgba(148,163,184,0.9);
             letter-spacing: 0.08em;
-            color: var(--text-muted);
-            text-align: left;
-            padding: 10px 12px;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
 
-        tbody tr {
-            background: var(--bg-card);
-            border-bottom: 1px solid rgba(31,41,55,0.8);
-        }
-
-        tbody tr:nth-child(even) {
-            background: #020617;
-        }
-
-        tbody td {
-            padding: 9px 12px;
+        td {
+            padding: 9px 13px;
             font-size: 13px;
+            border-bottom: 1px solid var(--border-soft);
             white-space: nowrap;
         }
 
-        tbody tr:hover {
-            background: rgba(15,23,42,0.9);
+        tr:hover {
+            background: rgba(30,64,175,0.25);
         }
 
-        .small {
-            font-size: 12px;
-            color: var(--text-muted);
+        .row-selectable {
+            cursor: pointer;
         }
 
-        /* --------------
-           Badges
-           -------------- */
+        .row-selected {
+            background: radial-gradient(circle at left,#1d4ed8,#020617) !important;
+        }
+
+        .small { font-size: 12px; color: var(--text-muted); }
+
+        /* Badges */
         .badge {
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            padding: 2px 9px;
+            padding: 3px 10px;
             border-radius: 999px;
             font-size: 11px;
             font-weight: 500;
+            border: 1px solid transparent;
         }
-
         .badge-dot {
             width: 8px;
             height: 8px;
@@ -213,46 +453,99 @@
         }
 
         .badge-online {
-            background: rgba(22,163,74,0.15);
+            background: rgba(52,199,89,0.18);
             color: var(--success);
+            border-color: rgba(52,199,89,0.55);
         }
-
         .badge-online .badge-dot {
             background: var(--success);
-            box-shadow: 0 0 8px rgba(34,197,94,0.7);
+            box-shadow: 0 0 12px rgba(52,199,89,0.9);
         }
 
         .badge-offline {
-            background: rgba(127,29,29,0.3);
+            background: rgba(255,69,58,0.18);
             color: var(--danger);
+            border-color: rgba(255,69,58,0.55);
         }
-
         .badge-offline .badge-dot {
             background: var(--danger);
         }
 
         .badge-net {
-            background: rgba(37,99,235,0.15);
-            color: var(--accent);
+            background: rgba(37,99,235,0.22);
+            color: #bfdbfe;
+            border-color: rgba(96,165,250,0.7);
         }
 
-        .temp-ok {
-            color: var(--success);
+        .badge-pill-soft {
+            background: rgba(15,23,42,0.8);
+            border: 1px dashed var(--border-soft);
+            color: var(--text-muted);
         }
 
-        .temp-warn {
-            color: var(--warning);
+        /* Temperature color classes */
+        .temp-ok { color: var(--success); }
+        .temp-warn { color: var(--warning); }
+        .temp-hot { color: var(--danger); }
+
+        /* Playlist details layout */
+        .playlist-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
         }
 
-        .temp-hot {
-            color: var(--danger);
+        .playlist-details-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
-        /* --------------
-           Footer
-           -------------- */
+        .playlist-items-table {
+            min-width: 600px;
+        }
+
+        .muted-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            border: 1px dashed var(--border-soft);
+            color: var(--text-muted);
+            background: rgba(15,23,42,0.9);
+        }
+
+        .playlist-header-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .playlist-select {
+            min-width: 180px;
+            max-width: 260px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.45);
+            background: rgba(15,23,42,0.95);
+            color: var(--text);
+            font-size: 12px;
+            outline: none;
+        }
+
+        .playlist-select:disabled {
+            opacity: 0.6;
+        }
+
+        /* Footer */
         .footer {
-            margin-top: 10px;
+            margin-top: 12px;
             font-size: 11px;
             color: var(--text-muted);
             display: flex;
@@ -260,182 +553,362 @@
             gap: 10px;
         }
 
-        @media (max-width: 640px) {
-            .page {
-                padding: 16px;
+        code {
+            font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas,
+                         "Liberation Mono", "Courier New", monospace;
+            font-size: 11px;
+            background: rgba(15,23,42,0.9);
+            padding: 2px 5px;
+            border-radius: 5px;
+            border: 1px solid rgba(148,163,184,0.35);
+        }
+
+        @media (max-width: 960px) {
+            .shell {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.08);
+            }
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .sidebar-footer {
+                margin-top: 0;
+                margin-left: auto;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .main {
+                padding: 10px;
             }
             .header {
+                flex-direction: column;
                 align-items: flex-start;
             }
-            .controls {
-                width: 100%;
-                justify-content: flex-start;
+            table {
+                min-width: 600px;
             }
         }
     </style>
 </head>
+
 <body>
 <div class="page">
-    <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="title-block">
-                <h1>ArenaSignage – Player Dashboard</h1>
-                <p>Live status of all registered Raspberry Pi / signage players.</p>
+    <div class="shell">
+
+        <!-- ===============================
+             SIDEBAR (like App Store / Storage)
+             =============================== -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="window-dots">
+                    <span class="window-dot red"></span>
+                    <span class="window-dot yellow"></span>
+                    <span class="window-dot green"></span>
+                </div>
+                <span class="sidebar-app-name">ArenaSignage</span>
             </div>
 
-            <div class="controls">
-                <div class="pill">
-                    <span class="pill-dot"></span>
-                    <span id="summary-text">
-                        <!-- Filled by JS -->
-                        Loading status…
+            <div class="sidebar-search">
+                <input type="text" placeholder="Search players…" disabled />
+            </div>
+
+            <div class="sidebar-section-title">MAIN</div>
+            <div class="sidebar-nav">
+                <button class="nav-tab nav-tab-active" data-view="players">
+                    <span class="label">
+                        <span class="dot"></span>
+                        Players
                     </span>
-                </div>
-                <button id="refresh-btn" class="btn">
-                    Refresh now
+                </button>
+
+                <button class="nav-tab" data-view="playlists">
+                    <span class="label">
+                        <span class="dot"></span>
+                        Playlists
+                    </span>
+                </button>
+
+                <button class="nav-tab nav-tab-disabled" disabled>
+                    <span class="label">
+                        <span class="dot"></span>
+                        Content
+                    </span>
+                </button>
+                <button class="nav-tab nav-tab-disabled" disabled>
+                    <span class="label">
+                        <span class="dot"></span>
+                        Groups
+                    </span>
+                </button>
+                <button class="nav-tab nav-tab-disabled" disabled>
+                    <span class="label">
+                        <span class="dot"></span>
+                        Settings
+                    </span>
                 </button>
             </div>
-        </header>
 
-        <!-- Card + Table -->
-        <section class="card">
-            <div class="card-header">
-                <div>
-                    <h2>Players</h2>
-                    <span>Compact status view (online state, temperature, network, last seen)</span>
+            <div class="sidebar-footer">
+                <div class="sidebar-avatar">A</div>
+                <div class="sidebar-user-info">
+                    <span class="name">Aleksandar</span>
+                    <span class="role">Admin</span>
                 </div>
-                <span class="small" id="last-refresh-label">
-                    <!-- Filled by JS -->
-                </span>
+            </div>
+        </aside>
+
+        <!-- ===============================
+             MAIN AREA
+             =============================== -->
+        <main class="main">
+
+            <div class="top-strip">
+                <span class="pill">ArenaSignage · v0.1 dashboard prototype</span>
             </div>
 
-            <div class="card-body">
-                <table id="players-table">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Player</th>
-                        <th>Status</th>
-                        <th>Temperature</th>
-                        <th>Local weather</th>
-                        <th>Network</th>
-                        <th>Last Seen (UTC)</th>
-                        <th>Location</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {# Initial render from server-side `players` list (will be
-                       overwritten by JS after first refresh, so keep it simple) #}
-                    {% for p in players %}
+            <!-- HEADER -->
+            <header class="header">
+                <div class="title-block">
+                    <h1>Players Overview</h1>
+                    <p>Monitor Raspberry Pi signage devices and inspect their playlists.</p>
+                </div>
+
+                <div class="controls">
+                    <div class="pill-status">
+                        <span class="pill-dot"></span>
+                        <span id="summary-text">Loading…</span>
+                    </div>
+
+                    <button id="refresh-btn" class="btn">Refresh now</button>
+                </div>
+            </header>
+
+            <!-- PLAYERS TABLE -->
+            <section id="players-view" class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Players</h2>
+                        <span>Online status, temperature, network &amp; location</span>
+                    </div>
+
+                    <span class="small" id="last-refresh-label"></span>
+                </div>
+
+                <div class="card-body">
+                    <table id="players-table">
+                        <thead>
                         <tr>
-                            <td>{{ p.id }}</td>
-                            <td>
-                                <div>{{ p.name }}</div>
-                                <div class="small">{{ p.device_id }}</div>
-                            </td>
-                            <td>
-                                {% if p.is_online %}
-                                    <span class="badge badge-online">
-                                        <span class="badge-dot"></span>
-                                        Online
-                                    </span>
-                                {% else %}
-                                    <span class="badge badge-offline">
-                                        <span class="badge-dot"></span>
-                                        Offline
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if p.temperature_c is not none %}
-                                    {% set temp_c = p.temperature_c %}
-                                    {% set temp_val = temp_c %}
-                                    {% set unit = "C" %}
-
-                                    {% if p.country and p.country.uses_fahrenheit %}
-                                        {% set temp_val = (temp_c * 9 / 5) + 32 %}
-                                        {% set unit = "F" %}
-                                    {% endif %}
-
-                                    {% if temp_c < 55 %}
-                                        {% set temp_class = "temp-ok" %}
-                                    {% elif temp_c < 70 %}
-                                        {% set temp_class = "temp-warn" %}
-                                    {% else %}
-                                        {% set temp_class = "temp-hot" %}
-                                    {% endif %}
-
-                                    <span class="{{ temp_class }}">
-                                        {{ temp_val | round(0, 'floor') }}°{{ unit }}
-                                    </span>
-                                {% else %}
-                                    <span class="small">n/a</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <span class="small">loading…</span>
-                            </td>
-                            <td>
-                                {% if p.network_type %}
-                                    <span class="badge badge-net">{{ p.network_type }}</span>
-                                {% else %}
-                                    <span class="small">unknown</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if p.last_seen %}
-                                    <span class="small">{{ p.last_seen.isoformat() }}</span>
-                                {% else %}
-                                    <span class="small">never</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if p.city or p.arena_name %}
-                                    <div class="small">
-                                        {{ p.city or "Unknown city" }}
-                                        {% if p.arena_name %} – {{ p.arena_name }}{% endif %}
-                                    </div>
-                                {% else %}
-                                    <span class="small">n/a</span>
-                                {% endif %}
-                            </td>
+                            <th>ID</th>
+                            <th>Player</th>
+                            <th>Status</th>
+                            <th>Temperature</th>
+                            <th>Weather</th>
+                            <th>Network</th>
+                            <th style="min-width:160px;">Last Seen (UTC)</th>
+                            <th>Location</th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </section>
+                        </thead>
 
-        <!-- Footer -->
-        <footer class="footer">
-            <span>
-                Data source: <code>/players/status</code> endpoint
-                (°C or °F depending on country) + <code>/players/&lt;id&gt;/weather</code>
-            </span>
-            <span id="auto-refresh-label">
-                Auto-refresh: every 5 seconds
-            </span>
-        </footer>
+                        <tbody>
+                        {% for p in players %}
+                            <tr class="row-selectable" data-player-id="{{ p.id }}">
+                                <td>{{ p.id }}</td>
+
+                                <td>
+                                    <div>{{ p.name }}</div>
+                                    <div class="small">{{ p.device_id }}</div>
+                                </td>
+
+                                <td>
+                                    {% if p.is_online %}
+                                        <span class="badge badge-online">
+                                            <span class="badge-dot"></span> Online
+                                        </span>
+                                    {% else %}
+                                        <span class="badge badge-offline">
+                                            <span class="badge-dot"></span> Offline
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if p.temperature_c is not none %}
+                                        {% set c = p.temperature_c %}
+                                        {% set display = c %}
+                                        {% set unit = "°C" %}
+
+                                        {% if p.country and p.country.uses_fahrenheit %}
+                                            {% set display = (c * 9 / 5) + 32 %}
+                                            {% set unit = "°F" %}
+                                        {% endif %}
+
+                                        {% if c < 55 %}
+                                            {% set cls = "temp-ok" %}
+                                        {% elif c < 70 %}
+                                            {% set cls = "temp-warn" %}
+                                        {% else %}
+                                            {% set cls = "temp-hot" %}
+                                        {% endif %}
+
+                                        <span class="{{ cls }}">{{ display | round(0,'floor') }}{{ unit }}</span>
+                                    {% else %}
+                                        <span class="small">n/a</span>
+                                    {% endif %}
+                                </td>
+
+                                <td><span class="small">loading…</span></td>
+
+                                <td>
+                                    {% if p.network_type %}
+                                        <span class="badge badge-net">{{ p.network_type }}</span>
+                                    {% else %}
+                                        <span class="small">unknown</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if p.last_seen %}
+                                        <div class="small">
+                                            {{ p.last_seen.strftime("%Y-%m-%d") }}<br>
+                                            {{ p.last_seen.strftime("%H:%M:%S") }}
+                                        </div>
+                                    {% else %}
+                                        <span class="small">never</span>
+                                    {% endif %}
+                                </td>
+
+                                <td>
+                                    {% if p.city or p.arena_name %}
+                                        <div class="small">
+                                            {{ p.city or "Unknown" }}
+                                            {% if p.arena_name %} – {{ p.arena_name }}{% endif %}
+                                        </div>
+                                    {% else %}
+                                        <span class="small">n/a</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SELECTED PLAYER PLAYLIST (WITH ASSIGN CONTROLS) -->
+            <section id="player-playlist-view" class="card">
+                <div class="card-header">
+                    <div>
+                        <h2>Selected Player Playlist</h2>
+                        <span id="playlist-subtitle">
+                            Click a player row to inspect and assign its active playlist.
+                        </span>
+                    </div>
+
+                    <div class="playlist-header-actions">
+                        <select id="active-playlist-select" class="playlist-select" disabled>
+                            <option value="">Select active playlist…</option>
+                        </select>
+
+                        <button id="playlist-assign-btn" class="btn-secondary" disabled>
+                            Set active
+                        </button>
+
+                        <button id="playlist-clear-btn" class="btn-secondary" disabled>
+                            Clear
+                        </button>
+
+                        <button id="playlist-refresh-btn" class="btn-secondary" disabled>
+                            Refresh playlist
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card-body" id="player-playlist-body">
+                    <div style="padding: 16px;">
+                        <span class="muted-pill">
+                            No player selected. Click on a player in the table above.
+                        </span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ALL PLAYLISTS VIEW (HIDDEN BY DEFAULT) -->
+            <section id="playlists-view" class="card" style="display:none;">
+                <div class="card-header">
+                    <div>
+                        <h2>Playlists</h2>
+                        <span>List of all playlists (editing coming soon)</span>
+                    </div>
+
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-secondary" id="playlists-new-btn">+ New Playlist</button>
+                        <button class="btn-secondary" id="playlists-refresh-btn">Reload</button>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <table id="playlists-table">
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Scope</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                            <th>Updated</th>
+                            <th>Owner</th>
+                        </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr><td colspan="7" class="small">Loading playlists…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <footer class="footer">
+                <span>
+                    Data source:
+                    <code>/players/status</code>,
+                    <code>/players/&lt;id&gt;/weather</code>,
+                    <code>/players/&lt;id&gt;/playlist</code>,
+                    <code>/players/&lt;id&gt;/active-playlist</code>,
+                    <code>/playlists/</code>
+                </span>
+
+                <span id="auto-refresh-label">
+                    Auto-refresh: every 5 seconds (players)
+                </span>
+            </footer>
+
+        </main>
     </div>
 </div>
 
 <script>
-    // --------------------------
-    // Utility: format last refresh time
-    // --------------------------
+    // ---------------------------
+    // Helpers / globals
+    // ---------------------------
     function formatTime(date) {
         const pad = (n) => n.toString().padStart(2, "0");
         return (
-            date.getUTCHours().toString().padStart(2, "0") + ":" +
+            pad(date.getUTCHours()) + ":" +
             pad(date.getUTCMinutes()) + ":" +
             pad(date.getUTCSeconds()) + " UTC"
         );
     }
 
-    // --------------------------
-    // Apply temperature color class (based on °C)
-    // --------------------------
     function getTempClass(tempC) {
         if (tempC === null || tempC === undefined) return "";
         if (tempC < 55) return "temp-ok";
@@ -443,11 +916,43 @@
         return "temp-hot";
     }
 
-    // --------------------------
-    // Fetch local weather for a single player
-    // --------------------------
+    let selectedPlayerId = null;
+    let selectedPlayerRow = null;
+    let playlistsLoadedOnce = false;
+    let allPlaylistsCache = null;
+
+    function clearSelectedRowHighlight() {
+        if (selectedPlayerRow) {
+            selectedPlayerRow.classList.remove("row-selected");
+        }
+    }
+
+    function setSelectedRowHighlight(row) {
+        clearSelectedRowHighlight();
+        selectedPlayerRow = row;
+        if (selectedPlayerRow) {
+            selectedPlayerRow.classList.add("row-selected");
+        }
+    }
+
+    function setPlaylistControlsEnabled(enabled) {
+        const select = document.getElementById("active-playlist-select");
+        const assignBtn = document.getElementById("playlist-assign-btn");
+        const clearBtn = document.getElementById("playlist-clear-btn");
+        const refreshBtn = document.getElementById("playlist-refresh-btn");
+
+        if (!select || !assignBtn || !clearBtn || !refreshBtn) return;
+
+        select.disabled = !enabled;
+        assignBtn.disabled = !enabled;
+        clearBtn.disabled = !enabled;
+        refreshBtn.disabled = !enabled;
+    }
+
+    // ---------------------------
+    // Weather
+    // ---------------------------
     async function fetchPlayerWeather(player, cell) {
-        // Ako nemamo grad ili državu – nema prognoze
         if (!player.city || !player.country_code) {
             cell.innerHTML = `<span class="small">n/a</span>`;
             return;
@@ -472,23 +977,326 @@
                 return;
             }
 
-            // Ako kasnije dodaš opis u weather_service, ovde ga možeš prikazati
-            const labelParts = [];
-            labelParts.push(`${temp}°${unit}`);
+            const parts = [];
+            parts.push(`${temp}°${unit}`);
             if (data.city) {
-                labelParts.push(data.city);
+                parts.push(data.city);
             }
 
-            cell.innerHTML = `<div class="small">${labelParts.join(" – ")}</div>`;
+            cell.innerHTML = `<div class="small">${parts.join(" – ")}</div>`;
         } catch (err) {
             console.error("Failed to load weather for player", player.id, err);
             cell.innerHTML = `<span class="small">n/a</span>`;
         }
     }
 
-    // --------------------------
-    // Render table rows from JSON
-    // --------------------------
+    // ---------------------------
+    // Active playlist selector
+    // ---------------------------
+    async function loadPlaylistsForSelector(currentPlaylistId) {
+        const select = document.getElementById("active-playlist-select");
+        const assignBtn = document.getElementById("playlist-assign-btn");
+        const clearBtn = document.getElementById("playlist-clear-btn");
+
+        if (!select || !assignBtn || !clearBtn) return;
+
+        select.disabled = true;
+        assignBtn.disabled = true;
+        clearBtn.disabled = selectedPlayerId == null;
+        select.innerHTML = `<option value="">Loading playlists…</option>`;
+
+        try {
+            if (!allPlaylistsCache) {
+                const resp = await fetch("/playlists/");
+                if (!resp.ok) {
+                    throw new Error("HTTP " + resp.status);
+                }
+                allPlaylistsCache = await resp.json();
+            }
+
+            const playlists = allPlaylistsCache || [];
+            if (!playlists.length) {
+                select.innerHTML = `<option value="">No playlists defined</option>`;
+                return;
+            }
+
+            let optionsHtml = `<option value="">Select active playlist…</option>`;
+            playlists.forEach((pl) => {
+                const name = pl.name || "Untitled playlist";
+                optionsHtml += `<option value="${pl.id}">${name}</option>`;
+            });
+
+            select.innerHTML = optionsHtml;
+
+            if (currentPlaylistId) {
+                select.value = String(currentPlaylistId);
+            }
+
+            select.disabled = false;
+            assignBtn.disabled = false;
+            clearBtn.disabled = false;
+        } catch (err) {
+            console.error("Failed to load playlists for selector:", err);
+            select.innerHTML = `<option value="">Error loading playlists</option>`;
+        }
+    }
+
+    function syncSelectorWithPlaylist(pkg) {
+        const select = document.getElementById("active-playlist-select");
+        if (!select) return;
+
+        const playlistId = pkg && pkg.playlist_id ? String(pkg.playlist_id) : "";
+        if (playlistId && Array.from(select.options).some(o => o.value === playlistId)) {
+            select.value = playlistId;
+        } else if (!playlistId) {
+            select.value = "";
+        }
+    }
+
+    async function setActivePlaylistForPlayer(playerId, playlistId) {
+        if (playerId == null) return;
+
+        const subtitle = document.getElementById("playlist-subtitle");
+        const select = document.getElementById("active-playlist-select");
+        const assignBtn = document.getElementById("playlist-assign-btn");
+        const clearBtn = document.getElementById("playlist-clear-btn");
+
+        try {
+            if (playlistId === null) {
+                subtitle.textContent = `Clearing active playlist for player ${playerId}…`;
+            } else {
+                subtitle.textContent = `Setting active playlist for player ${playerId}…`;
+            }
+
+            if (select) select.disabled = true;
+            if (assignBtn) assignBtn.disabled = true;
+            if (clearBtn) clearBtn.disabled = true;
+
+            const resp = await fetch(`/players/${playerId}/active-playlist`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ playlist_id: playlistId }),
+            });
+
+            if (!resp.ok) {
+                throw new Error("HTTP " + resp.status);
+            }
+
+            await resp.json();
+
+            if (playlistId === null) {
+                subtitle.textContent = `Active playlist cleared for player ${playerId}.`;
+            } else {
+                subtitle.textContent = `Active playlist set for player ${playerId}.`;
+            }
+
+            // Refresh playlist package view
+            fetchPlayerPlaylist(playerId);
+
+            // Update selector state
+            if (playlistId === null) {
+                if (select) select.value = "";
+            }
+        } catch (err) {
+            console.error("Failed to update active playlist:", err);
+            subtitle.textContent = `Failed to update active playlist for player ${playerId}.`;
+        } finally {
+            if (select) select.disabled = false;
+            if (assignBtn) assignBtn.disabled = false;
+            if (clearBtn) clearBtn.disabled = false;
+        }
+    }
+
+    // ---------------------------
+    // Playlist package panel
+    // ---------------------------
+    function renderPlaylistPackage(pkg) {
+        const body = document.getElementById("player-playlist-body");
+        const subtitle = document.getElementById("playlist-subtitle");
+
+        if (!pkg) {
+            body.innerHTML = `
+                <div style="padding: 16px;">
+                    <span class="muted-pill">
+                        No active playlist for this player.
+                    </span>
+                </div>
+            `;
+            subtitle.textContent = "No active playlist assigned.";
+            syncSelectorWithPlaylist(null);
+            return;
+        }
+
+        const items = pkg.items || [];
+        subtitle.textContent =
+            `Player ${pkg.player_id} – playlist "${pkg.playlist_name || "Untitled"}" (${items.length} item(s))`;
+
+        syncSelectorWithPlaylist(pkg);
+
+        const updated = pkg.playlist_updated_at || "n/a";
+        const timezone = pkg.timezone || "device default";
+
+        let html = "";
+
+        html += `<div style="padding: 14px 16px 10px 16px;">`;
+        html += `<div class="playlist-details-grid">`;
+        html += `
+            <div>
+                <div class="playlist-details-label">Playlist</div>
+                <div>${pkg.playlist_name || "Untitled"} (#${pkg.playlist_id || "n/a"})</div>
+            </div>
+        `;
+        html += `
+            <div>
+                <div class="playlist-details-label">Last updated</div>
+                <div>${updated}</div>
+            </div>
+        `;
+        html += `
+            <div>
+                <div class="playlist-details-label">Items</div>
+                <div>${items.length}</div>
+            </div>
+        `;
+        html += `
+            <div>
+                <div class="playlist-details-label">Timezone</div>
+                <div>${timezone}</div>
+            </div>
+        `;
+        html += `</div>`;
+        html += `</div>`;
+
+        html += `
+            <div style="border-top: 1px solid var(--border-soft); padding: 10px 0 0 0;">
+                <div style="overflow-x:auto;">
+                    <table class="playlist-items-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Position</th>
+                                <th>Type</th>
+                                <th>Duration</th>
+                                <th>Media URL</th>
+                                <th>Checksum</th>
+                                <th>Valid From</th>
+                                <th>Valid Until</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+        `;
+
+        if (!items.length) {
+            html += `
+                <tr>
+                    <td colspan="8" class="small">Playlist has no items.</td>
+                </tr>
+            `;
+        } else {
+            items.forEach((it, idx) => {
+                const pos = it.position !== null && it.position !== undefined
+                    ? it.position
+                    : idx;
+
+                const duration = it.duration_seconds != null
+                    ? `${it.duration_seconds}s`
+                    : "auto";
+
+                const shortUrl = it.media_url
+                    ? (it.media_url.length > 60
+                        ? it.media_url.slice(0, 57) + "…"
+                        : it.media_url)
+                    : "n/a";
+
+                const checksum = it.checksum
+                    ? (it.checksum.length > 16
+                        ? it.checksum.slice(0, 13) + "…"
+                        : it.checksum)
+                    : "n/a";
+
+                html += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${pos}</td>
+                        <td>${it.media_type || "n/a"}</td>
+                        <td>${duration}</td>
+                        <td><span class="small" title="${it.media_url || ""}">${shortUrl}</span></td>
+                        <td><span class="small" title="${it.checksum || ""}">${checksum}</span></td>
+                        <td><span class="small">${it.valid_from || ""}</span></td>
+                        <td><span class="small">${it.valid_until || ""}</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        body.innerHTML = html;
+    }
+
+    async function fetchPlayerPlaylist(playerId) {
+        const body = document.getElementById("player-playlist-body");
+        const subtitle = document.getElementById("playlist-subtitle");
+        const refreshBtn = document.getElementById("playlist-refresh-btn");
+
+        subtitle.textContent = `Loading playlist for player ${playerId}…`;
+        body.innerHTML = `
+            <div style="padding: 16px;">
+                <span class="small">Loading playlist…</span>
+            </div>
+        `;
+
+        if (refreshBtn) refreshBtn.disabled = true;
+
+        try {
+            const resp = await fetch(`/players/${playerId}/playlist`);
+            if (resp.status === 404) {
+                renderPlaylistPackage(null);
+                return;
+            }
+            if (!resp.ok) {
+                throw new Error("HTTP " + resp.status);
+            }
+
+            const pkg = await resp.json();
+            renderPlaylistPackage(pkg);
+        } catch (err) {
+            console.error("Failed to load playlist for player", playerId, err);
+            subtitle.textContent = `Failed to load playlist for player ${playerId}.`;
+            body.innerHTML = `
+                <div style="padding: 16px;">
+                    <span class="small">Error loading playlist package.</span>
+                </div>
+            `;
+        } finally {
+            if (refreshBtn) refreshBtn.disabled = false;
+        }
+    }
+
+    function handlePlayerRowClick(player) {
+        selectedPlayerId = player.id;
+
+        const tbody = document.querySelector("#players-table tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+        rows.forEach((row) => {
+            if (parseInt(row.getAttribute("data-player-id"), 10) === player.id) {
+                setSelectedRowHighlight(row);
+            }
+        });
+
+        setPlaylistControlsEnabled(true);
+        loadPlaylistsForSelector(null);
+        fetchPlayerPlaylist(player.id);
+    }
+
+    // ---------------------------
+    // Render players
+    // ---------------------------
     function renderPlayers(players) {
         const tbody = document.querySelector("#players-table tbody");
         tbody.innerHTML = "";
@@ -497,15 +1305,14 @@
 
         players.forEach((p) => {
             const tr = document.createElement("tr");
-
+            tr.classList.add("row-selectable");
+            tr.setAttribute("data-player-id", p.id);
             if (p.is_online) onlineCount++;
 
-            // ID
             const tdId = document.createElement("td");
             tdId.textContent = p.id;
             tr.appendChild(tdId);
 
-            // Player (name + device_id)
             const tdPlayer = document.createElement("td");
             tdPlayer.innerHTML = `
                 <div>${p.name}</div>
@@ -513,26 +1320,22 @@
             `;
             tr.appendChild(tdPlayer);
 
-            // Status badge
             const tdStatus = document.createElement("td");
             if (p.is_online) {
                 tdStatus.innerHTML = `
                     <span class="badge badge-online">
-                        <span class="badge-dot"></span>
-                        Online
+                        <span class="badge-dot"></span> Online
                     </span>
                 `;
             } else {
                 tdStatus.innerHTML = `
                     <span class="badge badge-offline">
-                        <span class="badge-dot"></span>
-                        Offline
+                        <span class="badge-dot"></span> Offline
                     </span>
                 `;
             }
             tr.appendChild(tdStatus);
 
-            // Temperature with °C / °F depending on uses_fahrenheit flag
             const tdTemp = document.createElement("td");
             if (p.temperature_c !== null && p.temperature_c !== undefined) {
                 const tempC = p.temperature_c;
@@ -541,24 +1344,22 @@
                 let displayTemp = tempC;
                 let unit = "°C";
 
-                const usesF = !!p.uses_fahrenheit;
-                if (usesF) {
+                if (p.uses_fahrenheit) {
                     displayTemp = Math.round(tempC * 9 / 5 + 32);
                     unit = "°F";
                 }
 
-                tdTemp.innerHTML = `<span class="${tempClass}">${displayTemp}${unit}</span>`;
+                tdTemp.innerHTML =
+                    `<span class="${tempClass}">${displayTemp}${unit}</span>`;
             } else {
                 tdTemp.innerHTML = `<span class="small">n/a</span>`;
             }
             tr.appendChild(tdTemp);
 
-            // Local weather (from /players/<id>/weather)
             const tdWeather = document.createElement("td");
             tdWeather.innerHTML = `<span class="small">loading…</span>`;
             tr.appendChild(tdWeather);
 
-            // Network
             const tdNet = document.createElement("td");
             if (p.network_type) {
                 tdNet.innerHTML = `
@@ -569,18 +1370,35 @@
             }
             tr.appendChild(tdNet);
 
-            // Last seen
             const tdLast = document.createElement("td");
             if (p.last_seen) {
-                tdLast.innerHTML = `<span class="small">${p.last_seen}</span>`;
+                let datePart = "";
+                let timePart = "";
+
+                try {
+                    const dt = new Date(p.last_seen);
+                    if (!isNaN(dt.getTime())) {
+                        datePart = dt.toISOString().split("T")[0];
+                        timePart = dt.toTimeString().split(" ")[0];
+                    } else {
+                        datePart = p.last_seen;
+                    }
+                } catch (err) {
+                    datePart = p.last_seen;
+                }
+
+                tdLast.innerHTML = `
+                    <div class="small">
+                        ${datePart}${timePart ? "<br>" + timePart : ""}
+                    </div>
+                `;
             } else {
                 tdLast.innerHTML = `<span class="small">never</span>`;
             }
             tr.appendChild(tdLast);
 
-            // Location (city + arena)
             const tdLoc = document.createElement("td");
-            const city = p.city || "Unknown city";
+            const city = p.city || "Unknown";
             const arena = p.arena_name ? " – " + p.arena_name : "";
             if (p.city || p.arena_name) {
                 tdLoc.innerHTML = `<div class="small">${city}${arena}</div>`;
@@ -589,9 +1407,15 @@
             }
             tr.appendChild(tdLoc);
 
-            tbody.appendChild(tr);
+            tr.addEventListener("click", () => {
+                handlePlayerRowClick(p);
+            });
 
-            // Nakon što je red dodat u tabelu – povuci lokalnu prognozu
+            if (selectedPlayerId !== null && p.id === selectedPlayerId) {
+                setSelectedRowHighlight(tr);
+            }
+
+            tbody.appendChild(tr);
             fetchPlayerWeather(p, tdWeather);
         });
 
@@ -599,9 +1423,9 @@
         summary.textContent = `Players online: ${onlineCount} / ${players.length}`;
     }
 
-    // --------------------------
-    // Fetch status from /players/status
-    // --------------------------
+    // ---------------------------
+    // Refresh players from backend
+    // ---------------------------
     async function refreshStatus() {
         const btn = document.getElementById("refresh-btn");
 
@@ -613,6 +1437,7 @@
             if (!resp.ok) {
                 throw new Error("HTTP " + resp.status);
             }
+
             const data = await resp.json();
             renderPlayers(data);
 
@@ -629,18 +1454,218 @@
         }
     }
 
-    // Initial auto-refresh label
+    // ---------------------------
+    // All playlists view (tab)
+    // ---------------------------
+    function renderPlaylists(playlists) {
+        const tbody = document.querySelector("#playlists-table tbody");
+        tbody.innerHTML = "";
+
+        if (!playlists || playlists.length === 0) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 7;
+            td.innerHTML = `<span class="small">No playlists defined yet.</span>`;
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        playlists.forEach((pl) => {
+            const tr = document.createElement("tr");
+
+            const tdId = document.createElement("td");
+            tdId.textContent = pl.id;
+            tr.appendChild(tdId);
+
+            const tdName = document.createElement("td");
+            const desc = pl.description || "";
+            tdName.innerHTML = `
+                <div>${pl.name || "Untitled playlist"}</div>
+                ${desc ? `<div class="small">${desc}</div>` : ""}
+            `;
+            tr.appendChild(tdName);
+
+            const tdScope = document.createElement("td");
+            const scope = pl.scope || "global";
+            tdScope.innerHTML = `
+                <span class="badge badge-pill-soft">${scope}</span>
+            `;
+            tr.appendChild(tdScope);
+
+            const tdStatus = document.createElement("td");
+            const active = (pl.is_active === undefined || pl.is_active === null)
+                ? true
+                : !!pl.is_active;
+            tdStatus.innerHTML = active
+                ? `<span class="badge badge-online"><span class="badge-dot"></span>Active</span>`
+                : `<span class="badge badge-offline"><span class="badge-dot"></span>Disabled</span>`;
+            tr.appendChild(tdStatus);
+
+            const tdItems = document.createElement("td");
+            const itemCount =
+                typeof pl.item_count === "number"
+                    ? pl.item_count
+                    : (pl.items ? pl.items.length : 0);
+            tdItems.textContent = itemCount;
+            tr.appendChild(tdItems);
+
+            const tdUpdated = document.createElement("td");
+            const updated = pl.updated_at || pl.created_at || null;
+            tdUpdated.innerHTML = updated
+                ? `<span class="small">${updated}</span>`
+                : `<span class="small">n/a</span>`;
+            tr.appendChild(tdUpdated);
+
+            const tdOwner = document.createElement("td");
+            const ownerType = pl.owner_type || "n/a";
+            const ownerLabel = pl.owner_name || "";
+            tdOwner.innerHTML = ownerLabel
+                ? `<div class="small">${ownerType} – ${ownerLabel}</div>`
+                : `<span class="small">${ownerType}</span>`;
+            tr.appendChild(tdOwner);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function refreshPlaylists() {
+        const tbody = document.querySelector("#playlists-table tbody");
+        const btn = document.getElementById("playlists-refresh-btn");
+
+        try {
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = "Loading…";
+            }
+
+            const resp = await fetch("/playlists/");
+            if (!resp.ok) {
+                throw new Error("HTTP " + resp.status);
+            }
+
+            const data = await resp.json();
+            allPlaylistsCache = data; // keep cache in sync
+            renderPlaylists(data);
+            playlistsLoadedOnce = true;
+        } catch (err) {
+            console.error("Failed to load playlists:", err);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <span class="small">Error loading playlists.</span>
+                    </td>
+                </tr>
+            `;
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = "Reload";
+            }
+        }
+    }
+
+    // ---------------------------
+    // View switching (sidebar)
+    // ---------------------------
+    function showView(view) {
+        const playersView = document.getElementById("players-view");
+        const playerPlaylistView = document.getElementById("player-playlist-view");
+        const playlistsView = document.getElementById("playlists-view");
+
+        if (view === "players") {
+            playersView.style.display = "";
+            playerPlaylistView.style.display = "";
+            playlistsView.style.display = "none";
+        } else if (view === "playlists") {
+            playersView.style.display = "none";
+            playerPlaylistView.style.display = "none";
+            playlistsView.style.display = "";
+            if (!playlistsLoadedOnce) {
+                refreshPlaylists();
+            }
+        }
+
+        document.querySelectorAll(".nav-tab[data-view]").forEach((btn) => {
+            if (btn.getAttribute("data-view") === view) {
+                btn.classList.add("nav-tab-active");
+            } else {
+                btn.classList.remove("nav-tab-active");
+            }
+        });
+    }
+
+    // ---------------------------
+    // Event wiring
+    // ---------------------------
+    document.getElementById("refresh-btn")
+        .addEventListener("click", refreshStatus);
+
+    const playlistsReloadBtn = document.getElementById("playlists-refresh-btn");
+    if (playlistsReloadBtn) {
+        playlistsReloadBtn.addEventListener("click", refreshPlaylists);
+    }
+
+    const playlistsNewBtn = document.getElementById("playlists-new-btn");
+    if (playlistsNewBtn) {
+        playlistsNewBtn.addEventListener("click", () => {
+            alert("Playlist editor is not implemented yet. Layout only for now.");
+        });
+    }
+
+    const playlistRefreshBtn = document.getElementById("playlist-refresh-btn");
+    if (playlistRefreshBtn) {
+        playlistRefreshBtn.addEventListener("click", () => {
+            if (selectedPlayerId != null) {
+                fetchPlayerPlaylist(selectedPlayerId);
+            }
+        });
+    }
+
+    const playlistAssignBtn = document.getElementById("playlist-assign-btn");
+    if (playlistAssignBtn) {
+        playlistAssignBtn.addEventListener("click", () => {
+            if (selectedPlayerId == null) return;
+            const select = document.getElementById("active-playlist-select");
+            if (!select || !select.value) return;
+            const pid = parseInt(select.value, 10);
+            if (!pid) return;
+            setActivePlaylistForPlayer(selectedPlayerId, pid);
+        });
+    }
+
+    const playlistClearBtn = document.getElementById("playlist-clear-btn");
+    if (playlistClearBtn) {
+        playlistClearBtn.addEventListener("click", () => {
+            if (selectedPlayerId == null) return;
+            setActivePlaylistForPlayer(selectedPlayerId, null);
+        });
+    }
+
+    document.querySelectorAll(".nav-tab[data-view]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            if (btn.disabled) return;
+            const view = btn.getAttribute("data-view");
+            if (!view) return;
+            showView(view);
+        });
+    });
+
     document.getElementById("auto-refresh-label").textContent =
-        "Auto-refresh: every 5 seconds";
+        "Auto-refresh: every 5 seconds (players)";
 
-    // Initial manual refresh button
-    document.getElementById("refresh-btn").addEventListener("click", refreshStatus);
+    setInterval(() => {
+        const pv = document.getElementById("players-view");
+        if (pv.style.display === "none") return;
+        refreshStatus();
+    }, 5000);
 
-    // Auto-refresh every 5 seconds
-    setInterval(refreshStatus, 5000);
-
-    // Do one refresh on page load (to normalize format)
-    window.addEventListener("load", refreshStatus);
+    window.addEventListener("load", () => {
+        showView("players");
+        setPlaylistControlsEnabled(false);
+        refreshStatus();
+    });
 </script>
+
 </body>
 </html>

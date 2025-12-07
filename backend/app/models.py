@@ -114,13 +114,56 @@ class Playlist(Base):
 
 
 # =====================================================
+# Media model (physical media assets)
+# =====================================================
+class Media(Base):
+    """
+    Physical media asset used by playlist items.
+
+    This model centralizes storage of actual files / URLs and metadata.
+    """
+    __tablename__ = "media"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    # Local file path on the server (if used)
+    file_path = Column(String(500), nullable=True)
+
+    # Public URL that a player agent can download from
+    public_url = Column(String(500), nullable=True)
+
+    # Optional generic media type, e.g. IMAGE, VIDEO, PDF, URL, HTML, etc.
+    media_type = Column(String(50), nullable=True)
+
+    # Optional checksum/hash (md5/sha256/etc.) for integrity verification
+    checksum = Column(String(128), nullable=True)
+
+    # Default duration in seconds for displaying this media
+    default_duration = Column(Integer, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
+        nullable=False,
+    )
+
+    # Playlist items that reference this media
+    playlist_items = relationship(
+        "PlaylistItem",
+        back_populates="media",
+    )
+
+
+# =====================================================
 # PlaylistItem model  (single slide / media in playlist)
 # =====================================================
 class PlaylistItem(Base):
     """
     Single media item (slide) inside a playlist.
 
-    Could be an image, video, HTML page, etc.
+    Can either reference a Media row (preferred) or use a direct media_url.
     """
     __tablename__ = "playlist_items"
 
@@ -132,11 +175,19 @@ class PlaylistItem(Base):
         nullable=False,
     )
 
+    # Optional foreign key to a Media entry
+    media_id = Column(
+        Integer,
+        ForeignKey("media.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+
     # Human-readable title (e.g. "Burger Promo Slide")
     title = Column(String(150), nullable=True)
 
-    # Path or URL to media (image, video, HTML page, etc.)
-    media_url = Column(String(500), nullable=False)
+    # Legacy / direct path or URL to media (image, video, HTML page, etc.)
+    # When media_id is set, this can be treated as a cached copy of the primary URL.
+    media_url = Column(String(500), nullable=True)
 
     # How long this item should be shown (in seconds)
     duration_seconds = Column(Integer, nullable=True)
@@ -145,6 +196,7 @@ class PlaylistItem(Base):
     order_index = Column(Integer, default=0, nullable=False)
 
     playlist = relationship("Playlist", back_populates="items")
+    media = relationship("Media", back_populates="playlist_items")
 
 
 # =====================================================
@@ -155,7 +207,8 @@ class Player(Base):
     Physical playback device (Raspberry Pi / signage player).
 
     Stores hardware/network info and current status. Playlists can be
-    attached directly, and/or inherited from its PlayerGroup.
+    attached directly, inherited from its PlayerGroup, and one playlist
+    can be marked as the currently active one for offline agents.
     """
     __tablename__ = "players"
 
@@ -182,6 +235,13 @@ class Player(Base):
     # Optional group membership (one primary group per player for now)
     group_id = Column(Integer, ForeignKey("player_groups.id"), nullable=True)
 
+    # Optional "resolved" active playlist for this player, used by the agent
+    active_playlist_id = Column(
+        Integer,
+        ForeignKey("playlists.id"),
+        nullable=True,
+    )
+
     # Relationships
     country = relationship("Country", back_populates="players")
     group = relationship("PlayerGroup", back_populates="players")
@@ -192,6 +252,9 @@ class Player(Base):
         back_populates="player",
         cascade="all, delete-orphan",
     )
+
+    # Resolved active playlist, if any (could be from direct or group assignment)
+    active_playlist = relationship("Playlist")
 
 
 # =====================================================
