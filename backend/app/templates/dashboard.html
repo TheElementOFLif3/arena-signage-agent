@@ -1,27 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8" />
     <title>ArenaSignage – Control Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <style>
-        /* ---------------------------
-           GLOBAL THEME – LIGHT & DARK
-        ---------------------------- */
-
-        /* Default = light theme */
+        /* --------------------------------
+           GLOBAL THEME TOKENS – LIGHT BASE
+        --------------------------------- */
         :root {
             --bg: #f5f5f7;
             --bg-elevated: #ffffff;
             --bg-elevated-soft: #f9fafb;
             --bg-sidebar: #f3f4f6;
-            --bg-card: rgba(255,255,255,0.98);
-            --bg-card-alt: rgba(245,247,250,0.98);
-            --bg-header: rgba(248,250,252,0.96);
+            --bg-card: rgba(255,255,255,0.96);
+            --bg-card-alt: rgba(248,250,252,0.98);
+            --bg-header: rgba(255,255,255,0.98);
 
-            --border: rgba(15,23,42,0.08);
-            --border-soft: rgba(15,23,42,0.04);
+            --border: rgba(148,163,184,0.35);
+            --border-soft: rgba(148,163,184,0.18);
 
             --text: #111827;
             --text-muted: #6b7280;
@@ -31,14 +29,16 @@
 
             --success: #34c759;
             --danger: #ff453a;
-            --warning: #f59e0b;
+            --warning: #ffd60a;
 
-            --shadow-strong: 0 30px 80px rgba(15,23,42,0.12);
-            --shadow-soft: 0 16px 35px rgba(15,23,42,0.08);
+            --shadow-soft: 0 30px 60px rgba(15,23,42,0.15);
+            --shadow-strong: 0 40px 90px rgba(15,23,42,0.25);
         }
 
-        /* Dark theme overrides */
-        :root[data-theme="dark"] {
+        /* ---------------------------
+           DARK THEME OVERRIDES
+        ---------------------------- */
+        body[data-theme="dark"] {
             --bg: #050509;
             --bg-elevated: #111118;
             --bg-elevated-soft: #151520;
@@ -47,8 +47,8 @@
             --bg-card-alt: rgba(25,25,36,0.98);
             --bg-header: rgba(28,28,40,0.96);
 
-            --border: rgba(255,255,255,0.06);
-            --border-soft: rgba(255,255,255,0.03);
+            --border: rgba(255,255,255,0.08);
+            --border-soft: rgba(255,255,255,0.04);
 
             --text: #f9fafb;
             --text-muted: #9ca3af;
@@ -56,16 +56,20 @@
             --accent: #0a84ff;
             --accent-soft: rgba(10,132,255,0.25);
 
-            --success: #34c759;
-            --danger: #ff453a;
-            --warning: #ffd60a;
-
-            --shadow-strong: 0 40px 90px rgba(0,0,0,0.85);
-            --shadow-soft: 0 24px 50px rgba(0,0,0,0.85);
+            --shadow-soft: 0 30px 60px rgba(0,0,0,0.75);
+            --shadow-strong: 0 45px 95px rgba(0,0,0,0.9);
         }
 
+        /* ---------------------------
+           GLOBAL RESET / BASE
+        ---------------------------- */
         * {
             box-sizing: border-box;
+            transition:
+                background-color .25s ease,
+                color .25s ease,
+                border-color .25s ease,
+                box-shadow .25s ease;
         }
 
         body {
@@ -73,14 +77,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
                          "Segoe UI", sans-serif;
             background:
-                radial-gradient(circle at top, #e5e7eb 0%, var(--bg) 55%, var(--bg) 100%);
+                radial-gradient(circle at top, #e5e7eb 0%, var(--bg) 45%, #e5e7eb 100%);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
         }
 
-        :root[data-theme="dark"] body {
+        body[data-theme="dark"] {
             background:
-                radial-gradient(circle at top, #151521 0%, #050509 55%, #020206 100%);
+                radial-gradient(circle at top, #1a1a24 0%, #050509 45%, #020206 100%);
         }
 
         .page {
@@ -95,13 +99,10 @@
             max-width: 1400px;
             border-radius: 26px;
             overflow: hidden;
-
-            background: radial-gradient(circle at top left,
-                        var(--bg-elevated-soft),
-                        var(--bg));
+            background: radial-gradient(circle at top left,var(--bg-elevated-soft),var(--bg));
             box-shadow:
                 var(--shadow-strong),
-                0 0 0 1px var(--border);
+                0 0 0 1px rgba(148,163,184,0.15);
             display: flex;
         }
 
@@ -115,7 +116,7 @@
             display: flex;
             flex-direction: column;
             padding: 12px 10px;
-            backdrop-filter: blur(26px);
+            backdrop-filter: blur(30px);
         }
 
         .sidebar-header {
@@ -147,21 +148,21 @@
 
         .sidebar-search input {
             width: 100%;
-            padding: 6px 10px;
+            padding: 7px 12px;
             border-radius: 999px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-soft);
             background: rgba(255,255,255,0.9);
             color: var(--text);
             font-size: 12px;
             outline: none;
         }
 
-        :root[data-theme="dark"] .sidebar-search input {
+        body[data-theme="dark"] .sidebar-search input {
             background: rgba(15,15,24,0.9);
         }
 
         .sidebar-search input::placeholder {
-            color: rgba(148,163,184,0.8);
+            color: rgba(148,163,184,0.9);
         }
 
         .sidebar-section-title {
@@ -173,7 +174,7 @@
         }
 
         .sidebar-nav {
-            padding: 4px 4px 8px 4px;
+            padding: 4px 6px 8px 6px;
             display: flex;
             flex-direction: column;
             gap: 4px;
@@ -190,7 +191,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: 0.12s ease-out;
+            transition: transform .1s ease-out, box-shadow .18s ease-out;
         }
 
         .nav-tab span.label {
@@ -207,19 +208,22 @@
         }
 
         .nav-tab:hover {
-            background: rgba(148,163,184,0.2);
+            background: rgba(255,255,255,0.9);
+            box-shadow: 0 10px 24px rgba(15,23,42,0.12);
+            transform: translateY(-1px);
         }
 
-        :root[data-theme="dark"] .nav-tab:hover {
-            background: rgba(31,41,55,0.55);
+        body[data-theme="dark"] .nav-tab:hover {
+            background: rgba(31,41,55,0.75);
+            box-shadow: 0 12px 26px rgba(0,0,0,0.8);
         }
 
         .nav-tab-active {
             background: radial-gradient(circle at top left,#2563eb,#0b172a);
             color: #e5f0ff;
-            border-color: rgba(129,140,248,0.9);
+            border-color: rgba(129,140,248,0.95);
             box-shadow:
-                0 12px 25px rgba(37,99,235,0.55),
+                0 14px 28px rgba(37,99,235,0.65),
                 0 0 0 1px rgba(15,23,42,0.9) inset;
         }
 
@@ -252,7 +256,7 @@
             font-size: 14px;
             font-weight: 600;
             color: white;
-            box-shadow: 0 0 12px rgba(236,72,153,0.9);
+            box-shadow: 0 0 14px rgba(236,72,153,0.9);
         }
 
         .sidebar-user-info {
@@ -275,37 +279,63 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 14px 18px 14px 14px;
-            background: radial-gradient(circle at top,
-                        var(--bg-elevated-soft),
-                        var(--bg));
-        }
-
-        :root[data-theme="dark"] .main {
-            background: radial-gradient(circle at top,#151521,#050509 55%);
+            padding: 16px 20px 16px 16px;
+            background: radial-gradient(circle at top,var(--bg-elevated-soft),var(--bg));
         }
 
         .top-strip {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
             font-size: 11px;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            gap: 10px;
         }
 
         .top-strip span.pill {
-            padding: 3px 10px;
+            padding: 4px 11px;
             border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--bg-header);
+            border: 1px solid rgba(148,163,184,0.35);
+            background: rgba(255,255,255,0.85);
+        }
+
+        body[data-theme="dark"] .top-strip span.pill {
+            background: rgba(15,23,42,0.9);
+        }
+
+        .top-tabs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .top-tab {
+            padding: 4px 12px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .top-tab-active {
+            background: rgba(15,23,42,0.06);
+            border-color: rgba(148,163,184,0.4);
+            color: var(--text);
+            box-shadow: 0 12px 26px rgba(15,23,42,0.12);
+        }
+
+        body[data-theme="dark"] .top-tab-active {
+            background: rgba(15,23,42,0.85);
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: 16px;
             gap: 12px;
         }
 
@@ -330,16 +360,21 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 4px 9px;
+            padding: 4px 10px;
             font-size: 11px;
-
             border-radius: 999px;
-            background: var(--bg-header);
+            background: rgba(255,255,255,0.9);
             border: 1px solid var(--border-soft);
-
             box-shadow:
-                0 0 0 1px rgba(15,23,42,0.03),
-                var(--shadow-soft);
+                0 8px 18px rgba(15,23,42,0.12),
+                0 0 0 1px rgba(243,244,246,0.9) inset;
+        }
+
+        body[data-theme="dark"] .pill-status {
+            background: rgba(17,24,39,0.95);
+            box-shadow:
+                0 8px 18px rgba(0,0,0,0.65),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
         }
 
         .pill-dot {
@@ -353,25 +388,16 @@
         .btn {
             padding: 6px 16px;
             border-radius: 999px;
-            border: 1px solid rgba(96,165,250,0.9);
+            border: 1px solid rgba(96,165,250,0.95);
             background: radial-gradient(circle at top,#3b82f6,#1d4ed8);
             color: #e5f0ff;
             font-weight: 500;
             font-size: 13px;
             cursor: pointer;
-
-            box-shadow:
-                0 14px 28px rgba(37,99,235,0.35),
-                0 0 0 1px rgba(15,23,42,0.06) inset;
-
-            transition: 0.1s;
-        }
-
-        :root[data-theme="dark"] .btn {
-            background: radial-gradient(circle at top,#3b82f6,#0b1120);
             box-shadow:
                 0 14px 28px rgba(37,99,235,0.7),
                 0 0 0 1px rgba(15,23,42,0.9) inset;
+            transition: transform .1s, box-shadow .1s;
         }
 
         .btn:hover:not(:disabled) {
@@ -380,8 +406,8 @@
         .btn:active:not(:disabled) {
             transform: translateY(0);
             box-shadow:
-                0 8px 16px rgba(15,23,42,0.2),
-                0 0 0 1px rgba(15,23,42,0.2) inset;
+                0 8px 16px rgba(15,23,42,0.9),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
         }
         .btn:disabled {
             opacity: 0.6;
@@ -391,17 +417,17 @@
         .btn-secondary {
             padding: 5px 13px;
             border-radius: 999px;
-            border: 1px solid var(--border);
-            background: var(--bg-header);
+            border: 1px solid rgba(148,163,184,0.4);
+            background: rgba(255,255,255,0.9);
             color: var(--text);
             font-size: 12px;
             cursor: pointer;
             box-shadow:
-                0 8px 18px rgba(0,0,0,0.03),
-                0 0 0 1px rgba(15,23,42,0.04) inset;
+                0 8px 18px rgba(15,23,42,0.1),
+                0 0 0 1px rgba(243,244,246,0.9) inset;
         }
 
-        :root[data-theme="dark"] .btn-secondary {
+        body[data-theme="dark"] .btn-secondary {
             background: rgba(15,23,42,0.9);
             box-shadow:
                 0 8px 18px rgba(0,0,0,0.7),
@@ -409,12 +435,12 @@
         }
 
         .btn-secondary:hover:not(:disabled) {
-            background: rgba(239,246,255,0.9);
+            background: rgba(219,234,254,0.9);
             border-color: rgba(129,140,248,0.8);
         }
 
-        :root[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
-            background: rgba(30,64,175,0.65);
+        body[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
+            background: rgba(30,64,175,0.75);
         }
 
         .btn-secondary:disabled {
@@ -431,9 +457,15 @@
             background: radial-gradient(circle at top,var(--bg-card),var(--bg-card-alt));
             box-shadow:
                 var(--shadow-soft),
-                0 0 0 1px rgba(15,23,42,0.02) inset;
+                0 0 0 1px rgba(255,255,255,0.3) inset;
             overflow: hidden;
             backdrop-filter: blur(26px);
+        }
+
+        body[data-theme="dark"] .card {
+            box-shadow:
+                var(--shadow-soft),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
         }
 
         .card + .card {
@@ -463,7 +495,9 @@
             overflow-x: auto;
         }
 
-        /* Tables */
+        /* ---------------------------
+           TABLES
+        ---------------------------- */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -471,14 +505,18 @@
         }
 
         thead {
-            background: var(--bg-header);
+            background: rgba(248,250,252,0.95);
+        }
+
+        body[data-theme="dark"] thead {
+            background: rgba(15,23,42,0.95);
         }
 
         th {
-            padding: 10px 13px;
+            padding: 9px 13px;
             font-size: 10px;
             text-transform: uppercase;
-            color: rgba(148,163,184,0.9);
+            color: rgba(148,163,184,0.95);
             letter-spacing: 0.08em;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
@@ -492,21 +530,12 @@
             white-space: nowrap;
         }
 
-        /* Column alignment tweaks */
-        th.col-network,
-        td.col-network,
-        th.col-lastseen,
-        td.col-lastseen {
-            text-align: center;
-        }
-
-        /* Hover – light vs dark */
         tr:hover {
-            background: rgba(37,99,235,0.06);
+            background: rgba(219,234,254,0.55);
         }
 
-        :root[data-theme="dark"] tr:hover {
-            background: rgba(30,64,175,0.25);
+        body[data-theme="dark"] tr:hover {
+            background: rgba(30,64,175,0.35);
         }
 
         .row-selectable {
@@ -517,13 +546,15 @@
             background: radial-gradient(circle at left,#1d4ed8,#e5e7eb) !important;
         }
 
-        :root[data-theme="dark"] .row-selected {
+        body[data-theme="dark"] .row-selected {
             background: radial-gradient(circle at left,#1d4ed8,#020617) !important;
         }
 
         .small { font-size: 12px; color: var(--text-muted); }
 
-        /* Badges */
+        /* ---------------------------
+           BADGES
+        ---------------------------- */
         .badge {
             display: inline-flex;
             align-items: center;
@@ -551,33 +582,32 @@
         }
 
         .badge-offline {
-            background: rgba(255,69,58,0.08);
-            color: var(--danger);
-            border-color: rgba(255,69,58,0.55);
+            background: rgba(148,163,184,0.15);
+            color: rgba(75,85,99,1);
+            border-color: rgba(148,163,184,0.6);
         }
         .badge-offline .badge-dot {
-            background: var(--danger);
+            background: rgba(156,163,175,1);
         }
 
         .badge-net {
-            background: rgba(37,99,235,0.12);
+            background: rgba(37,99,235,0.16);
             color: #1d4ed8;
             border-color: rgba(96,165,250,0.7);
         }
 
-        :root[data-theme="dark"] .badge-net {
-            background: rgba(37,99,235,0.22);
+        body[data-theme="dark"] .badge-net {
             color: #bfdbfe;
         }
 
         .badge-pill-soft {
-            background: rgba(15,23,42,0.03);
+            background: rgba(248,250,252,0.85);
             border: 1px dashed var(--border-soft);
             color: var(--text-muted);
         }
 
-        :root[data-theme="dark"] .badge-pill-soft {
-            background: rgba(15,23,42,0.8);
+        body[data-theme="dark"] .badge-pill-soft {
+            background: rgba(15,23,42,0.9);
         }
 
         /* Temperature color classes */
@@ -613,7 +643,11 @@
             font-size: 11px;
             border: 1px dashed var(--border-soft);
             color: var(--text-muted);
-            background: var(--bg-header);
+            background: rgba(248,250,252,0.9);
+        }
+
+        body[data-theme="dark"] .muted-pill {
+            background: rgba(15,23,42,0.9);
         }
 
         .playlist-header-actions {
@@ -630,17 +664,22 @@
             padding: 5px 10px;
             border-radius: 999px;
             border: 1px solid rgba(148,163,184,0.45);
-            background: var(--bg-header);
+            background: rgba(255,255,255,0.95);
             color: var(--text);
             font-size: 12px;
             outline: none;
+        }
+
+        body[data-theme="dark"] .playlist-select {
+            background: rgba(15,23,42,0.95);
+            color: var(--text);
         }
 
         .playlist-select:disabled {
             opacity: 0.6;
         }
 
-        /* Footer */
+        /* FOOTER */
         .footer {
             margin-top: 12px;
             font-size: 11px;
@@ -650,26 +689,55 @@
             gap: 10px;
         }
 
-        /* Code tag – styled per theme */
         code {
             font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas,
                          "Liberation Mono", "Courier New", monospace;
             font-size: 11px;
+            background: rgba(248,250,252,0.9);
             padding: 2px 5px;
             border-radius: 5px;
             border: 1px solid rgba(148,163,184,0.35);
         }
 
-        :root[data-theme="light"] code {
-            background: rgba(0,0,0,0.03);
-            color: #4b5563;
-            border-color: rgba(15,23,42,0.08);
+        body[data-theme="dark"] code {
+            background: rgba(15,23,42,0.9);
         }
 
-        :root[data-theme="dark"] code {
-            background: rgba(15,23,42,0.9);
-            color: #e5e7eb;
-            border-color: rgba(148,163,184,0.35);
+        /* ---------------------------
+           SKELETON LOADING
+        ---------------------------- */
+        .skeleton-row td {
+            padding: 10px 13px;
+        }
+
+        .skeleton-bar {
+            position: relative;
+            overflow: hidden;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(209,213,219,0.6);
+        }
+
+        body[data-theme="dark"] .skeleton-bar {
+            background: rgba(55,65,81,0.8);
+        }
+
+        .skeleton-bar::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg,
+                transparent,
+                rgba(255,255,255,0.7),
+                transparent
+            );
+            transform: translateX(-100%);
+            animation: skeleton-shimmer 1.2s infinite;
+        }
+
+        @keyframes skeleton-shimmer {
+            0%   { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         @media (max-width: 960px) {
@@ -709,13 +777,11 @@
     </style>
 </head>
 
-<body>
+<body data-theme="light">
 <div class="page">
     <div class="shell">
 
-        <!-- ===============================
-             SIDEBAR
-             =============================== -->
+        <!-- SIDEBAR -->
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="window-dots">
@@ -775,13 +841,16 @@
             </div>
         </aside>
 
-        <!-- ===============================
-             MAIN AREA
-             =============================== -->
+        <!-- MAIN AREA -->
         <main class="main">
 
             <div class="top-strip">
                 <span class="pill">ArenaSignage · v0.1 dashboard prototype</span>
+
+                <div class="top-tabs">
+                    <button class="top-tab top-tab-active" data-view="players">Players</button>
+                    <button class="top-tab" data-view="playlists">Playlists</button>
+                </div>
             </div>
 
             <!-- HEADER -->
@@ -797,7 +866,7 @@
                         <span id="summary-text">Loading…</span>
                     </div>
 
-                    <button id="theme-toggle" class="btn-secondary">Light / Dark</button>
+                    <button id="theme-toggle-btn" class="btn-secondary">Light / Dark</button>
                     <button id="refresh-btn" class="btn">Refresh now</button>
                 </div>
             </header>
@@ -817,20 +886,23 @@
                     <table id="players-table">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Player</th>
-                            <th>Status</th>
-                            <th>Temperature</th>
-                            <th>Weather</th>
-                            <th class="col-network">Network</th>
-                            <th class="col-lastseen">
-                                Last seen<br><span class="small">(local time)</span>
+                            <th style="width:60px;">ID</th>
+                            <th style="min-width:180px;">Player</th>
+                            <th style="width:120px;">Status</th>
+                            <th style="width:120px;">Temperature</th>
+                            <th style="min-width:170px;">Weather</th>
+                            <th style="width:110px;">Network</th>
+                            <th style="min-width:180px;">
+                                LAST SEEN<br>
+                                <span class="small" id="last-seen-header-label">(LOCAL TIME)</span>
                             </th>
-                            <th>Location</th>
+                            <th style="min-width:160px;">Location</th>
                         </tr>
                         </thead>
 
                         <tbody>
+                        <!-- Initial server-rendered rows (will be replaced by JS on refresh)
+                             kept for no-JS / very first paint -->
                         {% for p in players %}
                             <tr class="row-selectable" data-player-id="{{ p.id }}">
                                 <td>{{ p.id }}</td>
@@ -879,7 +951,7 @@
 
                                 <td><span class="small">loading…</span></td>
 
-                                <td class="col-network">
+                                <td>
                                     {% if p.network_type %}
                                         <span class="badge badge-net">{{ p.network_type }}</span>
                                     {% else %}
@@ -887,10 +959,11 @@
                                     {% endif %}
                                 </td>
 
-                                <td class="col-lastseen">
+                                <td>
                                     {% if p.last_seen %}
                                         <div class="small">
-                                            {{ p.last_seen.isoformat() }} <!-- JS će ovo preformatirati -->
+                                            {{ p.last_seen.strftime("%Y-%m-%d") }}<br>
+                                            {{ p.last_seen.strftime("%H:%M:%S") }} UTC
                                         </div>
                                     {% else %}
                                         <span class="small">never</span>
@@ -1009,86 +1082,72 @@
 
 <script>
     // ---------------------------
-    // THEME TOGGLE
-    // ---------------------------
-    const rootEl = document.documentElement;
-    const themeToggleBtn = document.getElementById("theme-toggle");
-
-    function applyTheme(theme) {
-        rootEl.setAttribute("data-theme", theme);
-    }
-
-    let currentTheme = localStorage.getItem("arenaTheme") || "light";
-    applyTheme(currentTheme);
-
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
-            currentTheme = currentTheme === "light" ? "dark" : "light";
-            applyTheme(currentTheme);
-            localStorage.setItem("arenaTheme", currentTheme);
-        });
-    }
-
-    // ---------------------------
-    // Timezone helpers
-    // ---------------------------
-    const userTimeZone = (function () {
-        try {
-            return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-        } catch (e) {
-            return "UTC";
-        }
-    })();
-
-    const userTzAbbr = (function () {
-        try {
-            const s = new Date().toLocaleTimeString("en-US", {
-                timeZone: userTimeZone,
-                timeZoneName: "short"
-            });
-            const parts = s.split(" ");
-            return parts[parts.length - 1] || "UTC";
-        } catch (e) {
-            return "UTC";
-        }
-    })();
-
-    function formatLocalDateTime(isoString) {
-        if (!isoString) return null;
-        const d = new Date(isoString);
-        if (isNaN(d.getTime())) return null;
-
-        const dateStr = new Intl.DateTimeFormat(undefined, {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            timeZone: userTimeZone
-        }).format(d);
-
-        const timeStr = new Intl.DateTimeFormat(undefined, {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: false,
-            timeZone: userTimeZone
-        }).format(d);
-
-        return { dateStr, timeStr };
-    }
-
-    function formatLocalTimeLabel(dateObj) {
-        const info = formatLocalDateTime(dateObj.toISOString());
-        if (!info) return "";
-        return `${info.timeStr} ${userTzAbbr}`;
-    }
-
-    // ---------------------------
     // Helpers / globals
     // ---------------------------
+    function showSkeletonRows() {
+        const tbody = document.querySelector("#players-table tbody");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        const skeletonCount = 3;
+
+        for (let i = 0; i < skeletonCount; i++) {
+            const tr = document.createElement("tr");
+            tr.classList.add("skeleton-row");
+            for (let c = 0; c < 8; c++) {
+                const td = document.createElement("td");
+                const bar = document.createElement("div");
+                bar.className = "skeleton-bar";
+                td.appendChild(bar);
+                tr.appendChild(td);
+            }
+            tbody.appendChild(tr);
+        }
+    }
+
+    function getTempClass(tempC) {
+        if (tempC === null || tempC === undefined) return "";
+        if (tempC < 55) return "temp-ok";
+        if (tempC < 70) return "temp-warn";
+        return "temp-hot";
+    }
+
     let selectedPlayerId = null;
     let selectedPlayerRow = null;
     let playlistsLoadedOnce = false;
     let allPlaylistsCache = null;
+
+    let userTimeZone = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "Local";
+    let timeZoneShort = "LOCAL TIME";
+
+    try {
+        const now = new Date();
+        const locale = navigator.language || "en-US";
+        const parts = new Intl.DateTimeFormat(locale, {
+            timeZone: userTimeZone,
+            timeZoneName: "short"
+        }).formatToParts(now);
+        const tzPart = parts.find(p => p.type === "timeZoneName");
+        if (tzPart && tzPart.value) {
+            timeZoneShort = tzPart.value;
+        }
+    } catch (err) {
+        console.warn("Failed to resolve time zone name, using fallback.", err);
+    }
+
+    function formatLastRefresh(date) {
+        try {
+            const locale = navigator.language || "en-US";
+            return date.toLocaleTimeString(locale, {
+                hour12: false,
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                timeZone: userTimeZone
+            }) + " " + timeZoneShort;
+        } catch {
+            return date.toISOString().split("T")[1].split(".")[0] + " " + timeZoneShort;
+        }
+    }
 
     function clearSelectedRowHighlight() {
         if (selectedPlayerRow) {
@@ -1131,9 +1190,7 @@
 
         try {
             const resp = await fetch(`/players/${player.id}/weather`);
-            if (!resp.ok) {
-                throw new Error("HTTP " + resp.status);
-            }
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
 
             const data = await resp.json();
             const w = data.weather || {};
@@ -1148,9 +1205,7 @@
 
             const parts = [];
             parts.push(`${temp}°${unit}`);
-            if (data.city) {
-                parts.push(data.city);
-            }
+            if (data.city) parts.push(data.city);
 
             cell.innerHTML = `<div class="small">${parts.join(" – ")}</div>`;
         } catch (err) {
@@ -1177,9 +1232,7 @@
         try {
             if (!allPlaylistsCache) {
                 const resp = await fetch("/playlists/");
-                if (!resp.ok) {
-                    throw new Error("HTTP " + resp.status);
-                }
+                if (!resp.ok) throw new Error("HTTP " + resp.status);
                 allPlaylistsCache = await resp.json();
             }
 
@@ -1247,10 +1300,7 @@
                 body: JSON.stringify({ playlist_id: playlistId }),
             });
 
-            if (!resp.ok) {
-                throw new Error("HTTP " + resp.status);
-            }
-
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
             await resp.json();
 
             if (playlistId === null) {
@@ -1361,7 +1411,7 @@
             `;
         } else {
             items.forEach((it, idx) => {
-                const pos = it.position !== null && it.position !== undefined
+                const pos = (it.position !== null && it.position !== undefined)
                     ? it.position
                     : idx;
 
@@ -1426,9 +1476,7 @@
                 renderPlaylistPackage(null);
                 return;
             }
-            if (!resp.ok) {
-                throw new Error("HTTP " + resp.status);
-            }
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
 
             const pkg = await resp.json();
             renderPlaylistPackage(pkg);
@@ -1506,11 +1554,7 @@
             const tdTemp = document.createElement("td");
             if (p.temperature_c !== null && p.temperature_c !== undefined) {
                 const tempC = p.temperature_c;
-                const tempClass = (function () {
-                    if (tempC < 55) return "temp-ok";
-                    if (tempC < 70) return "temp-warn";
-                    return "temp-hot";
-                })();
+                const tempClass = getTempClass(tempC);
 
                 let displayTemp = tempC;
                 let unit = "°C";
@@ -1532,7 +1576,6 @@
             tr.appendChild(tdWeather);
 
             const tdNet = document.createElement("td");
-            tdNet.classList.add("col-network");
             if (p.network_type) {
                 tdNet.innerHTML = `
                     <span class="badge badge-net">${p.network_type}</span>
@@ -1543,17 +1586,29 @@
             tr.appendChild(tdNet);
 
             const tdLast = document.createElement("td");
-            tdLast.classList.add("col-lastseen");
             if (p.last_seen) {
-                const info = formatLocalDateTime(p.last_seen);
-                if (info) {
+                try {
+                    const dt = new Date(p.last_seen);
+                    const locale = navigator.language || "en-US";
+                    const formatted = dt.toLocaleString(locale, {
+                        hour12: false,
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        timeZone: userTimeZone
+                    });
+                    const [datePart, timePart] = formatted.split(",").map(s => s.trim());
                     tdLast.innerHTML = `
                         <div class="small">
-                            ${info.dateStr}<br>${info.timeStr} ${userTzAbbr}
+                            ${datePart}<br>${timePart} ${timeZoneShort}
                         </div>
                     `;
-                } else {
-                    tdLast.innerHTML = `<span class="small">never</span>`;
+                } catch (err) {
+                    console.warn("Failed to format last_seen, using raw.", err);
+                    tdLast.innerHTML = `<span class="small">${p.last_seen}</span>`;
                 }
             } else {
                 tdLast.innerHTML = `<span class="small">never</span>`;
@@ -1592,25 +1647,34 @@
     async function refreshStatus() {
         const btn = document.getElementById("refresh-btn");
 
+        showSkeletonRows();
+
         try {
             btn.disabled = true;
             btn.textContent = "Refreshing…";
 
             const resp = await fetch("/players/status");
-            if (!resp.ok) {
-                throw new Error("HTTP " + resp.status);
-            }
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
 
             const data = await resp.json();
             renderPlayers(data);
 
             const now = new Date();
-            const label = document.getElementById("last-refresh-label");
-            label.textContent = "Last refresh: " + formatLocalTimeLabel(now);
+            document.getElementById("last-refresh-label").textContent =
+                "Last refresh: " + formatLastRefresh(now);
         } catch (err) {
             console.error("Failed to refresh player status:", err);
             document.getElementById("summary-text").textContent =
                 "Error loading player status";
+
+            const tbody = document.querySelector("#players-table tbody");
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8">
+                        <span class="small">Error loading players.</span>
+                    </td>
+                </tr>
+            `;
         } finally {
             btn.disabled = false;
             btn.textContent = "Refresh now";
@@ -1703,9 +1767,7 @@
             }
 
             const resp = await fetch("/playlists/");
-            if (!resp.ok) {
-                throw new Error("HTTP " + resp.status);
-            }
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
 
             const data = await resp.json();
             allPlaylistsCache = data;
@@ -1729,7 +1791,7 @@
     }
 
     // ---------------------------
-    // View switching (sidebar)
+    // View switching (sidebar + top tabs)
     // ---------------------------
     function showView(view) {
         const playersView = document.getElementById("players-view");
@@ -1756,6 +1818,47 @@
                 btn.classList.remove("nav-tab-active");
             }
         });
+
+        document.querySelectorAll(".top-tab[data-view]").forEach((btn) => {
+            if (btn.getAttribute("data-view") === view) {
+                btn.classList.add("top-tab-active");
+            } else {
+                btn.classList.remove("top-tab-active");
+            }
+        });
+    }
+
+    // ---------------------------
+    // THEME HANDLING
+    // ---------------------------
+    function applyTheme(theme) {
+        const body = document.body;
+        const btn = document.getElementById("theme-toggle-btn");
+        if (!body || !btn) return;
+
+        body.setAttribute("data-theme", theme);
+        localStorage.setItem("arenaTheme", theme);
+
+        btn.textContent = "Light / Dark";
+    }
+
+    function initTheme() {
+        let theme = localStorage.getItem("arenaTheme");
+        if (!theme) {
+            const prefersDark = window.matchMedia &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches;
+            theme = prefersDark ? "dark" : "light";
+        }
+        applyTheme(theme);
+
+        if (window.matchMedia) {
+            window.matchMedia("(prefers-color-scheme: dark)")
+                .addEventListener("change", (e) => {
+                    const stored = localStorage.getItem("arenaTheme");
+                    if (stored) return;
+                    applyTheme(e.matches ? "dark" : "light");
+                });
+        }
     }
 
     // ---------------------------
@@ -1814,8 +1917,28 @@
         });
     });
 
+    document.querySelectorAll(".top-tab[data-view]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const view = btn.getAttribute("data-view");
+            if (!view) return;
+            showView(view);
+        });
+    });
+
     document.getElementById("auto-refresh-label").textContent =
         "Auto-refresh: every 5 seconds (players)";
+
+    document.getElementById("theme-toggle-btn")
+        .addEventListener("click", () => {
+            const cur = document.body.getAttribute("data-theme") || "light";
+            applyTheme(cur === "light" ? "dark" : "light");
+        });
+
+    // Set header label to actual time zone (e.g. CST, CET…)
+    const headerLabel = document.getElementById("last-seen-header-label");
+    if (headerLabel) {
+        headerLabel.textContent = `(${timeZoneShort})`;
+    }
 
     setInterval(() => {
         const pv = document.getElementById("players-view");
@@ -1824,6 +1947,7 @@
     }, 5000);
 
     window.addEventListener("load", () => {
+        initTheme();
         showView("players");
         setPlaylistControlsEnabled(false);
         refreshStatus();
