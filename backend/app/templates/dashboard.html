@@ -1,36 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8" />
     <title>ArenaSignage – Control Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- macOS App Store style – LIGHT Apple Glass -->
     <style>
         /* ---------------------------
-           GLOBAL THEME (light Apple style)
+           GLOBAL THEME – LIGHT & DARK
         ---------------------------- */
+
+        /* Default = light theme */
         :root {
             --bg: #f5f5f7;
             --bg-elevated: #ffffff;
             --bg-elevated-soft: #f9fafb;
-            --bg-sidebar: rgba(255,255,255,0.88);
-            --bg-card: rgba(255,255,255,0.95);
-            --bg-card-alt: rgba(248,249,252,0.98);
-            --bg-header: rgba(250,250,252,0.96);
+            --bg-sidebar: #f3f4f6;
+            --bg-card: rgba(255,255,255,0.98);
+            --bg-card-alt: rgba(245,247,250,0.98);
+            --bg-header: rgba(248,250,252,0.96);
 
             --border: rgba(15,23,42,0.08);
-            --border-soft: rgba(148,163,184,0.25);
+            --border-soft: rgba(15,23,42,0.04);
 
             --text: #111827;
             --text-muted: #6b7280;
 
             --accent: #0a84ff;
-            --accent-soft: rgba(10,132,255,0.15);
+            --accent-soft: rgba(10,132,255,0.18);
 
             --success: #34c759;
-            --danger: #ff3b30;
-            --warning: #ffcc00;
+            --danger: #ff453a;
+            --warning: #f59e0b;
+
+            --shadow-strong: 0 30px 80px rgba(15,23,42,0.12);
+            --shadow-soft: 0 16px 35px rgba(15,23,42,0.08);
+        }
+
+        /* Dark theme overrides */
+        :root[data-theme="dark"] {
+            --bg: #050509;
+            --bg-elevated: #111118;
+            --bg-elevated-soft: #151520;
+            --bg-sidebar: #08080f;
+            --bg-card: rgba(18,18,26,0.98);
+            --bg-card-alt: rgba(25,25,36,0.98);
+            --bg-header: rgba(28,28,40,0.96);
+
+            --border: rgba(255,255,255,0.06);
+            --border-soft: rgba(255,255,255,0.03);
+
+            --text: #f9fafb;
+            --text-muted: #9ca3af;
+
+            --accent: #0a84ff;
+            --accent-soft: rgba(10,132,255,0.25);
+
+            --success: #34c759;
+            --danger: #ff453a;
+            --warning: #ffd60a;
+
+            --shadow-strong: 0 40px 90px rgba(0,0,0,0.85);
+            --shadow-soft: 0 24px 50px rgba(0,0,0,0.85);
         }
 
         * {
@@ -42,9 +73,14 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
                          "Segoe UI", sans-serif;
             background:
-                radial-gradient(circle at top, #ffffff 0%, #f5f5f7 45%, #e5e7eb 100%);
+                radial-gradient(circle at top, #e5e7eb 0%, var(--bg) 55%, var(--bg) 100%);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
+        }
+
+        :root[data-theme="dark"] body {
+            background:
+                radial-gradient(circle at top, #151521 0%, #050509 55%, #020206 100%);
         }
 
         .page {
@@ -60,20 +96,22 @@
             border-radius: 26px;
             overflow: hidden;
 
-            background: radial-gradient(circle at top left,#ffffff,#f3f4f6 55%,#e5e7eb 100%);
+            background: radial-gradient(circle at top left,
+                        var(--bg-elevated-soft),
+                        var(--bg));
             box-shadow:
-                0 40px 90px rgba(15,23,42,0.20),
-                0 0 0 1px rgba(148,163,184,0.25);
+                var(--shadow-strong),
+                0 0 0 1px var(--border);
             display: flex;
         }
 
         /* ---------------------------
-           SIDEBAR (left)
+           SIDEBAR
         ---------------------------- */
         .sidebar {
             width: 240px;
-            background: linear-gradient(180deg,#fdfdfd,#f3f4f6);
-            border-right: 1px solid rgba(148,163,184,0.25);
+            background: linear-gradient(180deg,var(--bg-sidebar),var(--bg));
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             padding: 12px 10px;
@@ -111,15 +149,19 @@
             width: 100%;
             padding: 6px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.4);
-            background: rgba(255,255,255,0.92);
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.9);
             color: var(--text);
             font-size: 12px;
             outline: none;
         }
 
+        :root[data-theme="dark"] .sidebar-search input {
+            background: rgba(15,15,24,0.9);
+        }
+
         .sidebar-search input::placeholder {
-            color: rgba(148,163,184,0.9);
+            color: rgba(148,163,184,0.8);
         }
 
         .sidebar-section-title {
@@ -127,7 +169,7 @@
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: rgba(107,114,128,0.9);
+            color: rgba(148,163,184,0.9);
         }
 
         .sidebar-nav {
@@ -161,29 +203,33 @@
             width: 9px;
             height: 9px;
             border-radius: 999px;
-            background: rgba(148,163,184,0.7);
+            background: rgba(148,163,184,0.6);
         }
 
         .nav-tab:hover {
-            background: rgba(243,244,246,0.9);
+            background: rgba(148,163,184,0.2);
+        }
+
+        :root[data-theme="dark"] .nav-tab:hover {
+            background: rgba(31,41,55,0.55);
         }
 
         .nav-tab-active {
-            background: radial-gradient(circle at top left,#2563eb,#60a5fa);
-            color: #f9fafb;
-            border-color: rgba(37,99,235,0.9);
+            background: radial-gradient(circle at top left,#2563eb,#0b172a);
+            color: #e5f0ff;
+            border-color: rgba(129,140,248,0.9);
             box-shadow:
-                0 12px 25px rgba(37,99,235,0.35),
-                0 0 0 1px rgba(15,23,42,0.05) inset;
+                0 12px 25px rgba(37,99,235,0.55),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
         }
 
         .nav-tab-active span.dot {
-            background: #e0f2fe;
-            box-shadow: 0 0 12px rgba(56,189,248,0.8);
+            background: #60a5fa;
+            box-shadow: 0 0 12px rgba(56,189,248,0.9);
         }
 
         .nav-tab-disabled {
-            opacity: 0.4;
+            opacity: 0.35;
             cursor: default;
         }
 
@@ -206,7 +252,7 @@
             font-size: 14px;
             font-weight: 600;
             color: white;
-            box-shadow: 0 0 12px rgba(236,72,153,0.7);
+            box-shadow: 0 0 12px rgba(236,72,153,0.9);
         }
 
         .sidebar-user-info {
@@ -223,14 +269,20 @@
         }
 
         /* ---------------------------
-           MAIN AREA (right)
+           MAIN AREA
         ---------------------------- */
         .main {
             flex: 1;
             display: flex;
             flex-direction: column;
             padding: 14px 18px 14px 14px;
-            background: radial-gradient(circle at top,#ffffff,#f3f4f6 55%);
+            background: radial-gradient(circle at top,
+                        var(--bg-elevated-soft),
+                        var(--bg));
+        }
+
+        :root[data-theme="dark"] .main {
+            background: radial-gradient(circle at top,#151521,#050509 55%);
         }
 
         .top-strip {
@@ -245,8 +297,8 @@
         .top-strip span.pill {
             padding: 3px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.5);
-            background: rgba(255,255,255,0.9);
+            border: 1px solid var(--border);
+            background: var(--bg-header);
         }
 
         .header {
@@ -282,12 +334,12 @@
             font-size: 11px;
 
             border-radius: 999px;
-            background: rgba(255,255,255,0.95);
-            border: 1px solid rgba(209,213,219,0.9);
+            background: var(--bg-header);
+            border: 1px solid var(--border-soft);
 
             box-shadow:
-                0 8px 18px rgba(148,163,184,0.35),
-                0 0 0 1px rgba(243,244,246,0.9) inset;
+                0 0 0 1px rgba(15,23,42,0.03),
+                var(--shadow-soft);
         }
 
         .pill-dot {
@@ -295,24 +347,31 @@
             height: 8px;
             background: var(--success);
             border-radius: 999px;
-            box-shadow: 0 0 8px rgba(52,199,89,0.8);
+            box-shadow: 0 0 8px rgba(52,199,89,0.9);
         }
 
         .btn {
             padding: 6px 16px;
             border-radius: 999px;
-            border: 1px solid rgba(37,99,235,0.9);
-            background: radial-gradient(circle at top,#3b82f6,#2563eb);
-            color: #f9fafb;
+            border: 1px solid rgba(96,165,250,0.9);
+            background: radial-gradient(circle at top,#3b82f6,#1d4ed8);
+            color: #e5f0ff;
             font-weight: 500;
             font-size: 13px;
             cursor: pointer;
 
             box-shadow:
                 0 14px 28px rgba(37,99,235,0.35),
-                0 0 0 1px rgba(15,23,42,0.05) inset;
+                0 0 0 1px rgba(15,23,42,0.06) inset;
 
             transition: 0.1s;
+        }
+
+        :root[data-theme="dark"] .btn {
+            background: radial-gradient(circle at top,#3b82f6,#0b1120);
+            box-shadow:
+                0 14px 28px rgba(37,99,235,0.7),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
         }
 
         .btn:hover:not(:disabled) {
@@ -321,8 +380,8 @@
         .btn:active:not(:disabled) {
             transform: translateY(0);
             box-shadow:
-                0 8px 16px rgba(37,99,235,0.3),
-                0 0 0 1px rgba(15,23,42,0.08) inset;
+                0 8px 16px rgba(15,23,42,0.2),
+                0 0 0 1px rgba(15,23,42,0.2) inset;
         }
         .btn:disabled {
             opacity: 0.6;
@@ -332,19 +391,30 @@
         .btn-secondary {
             padding: 5px 13px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.7);
-            background: rgba(255,255,255,0.95);
+            border: 1px solid var(--border);
+            background: var(--bg-header);
             color: var(--text);
             font-size: 12px;
             cursor: pointer;
             box-shadow:
-                0 8px 18px rgba(148,163,184,0.25),
-                0 0 0 1px rgba(243,244,246,0.9) inset;
+                0 8px 18px rgba(0,0,0,0.03),
+                0 0 0 1px rgba(15,23,42,0.04) inset;
+        }
+
+        :root[data-theme="dark"] .btn-secondary {
+            background: rgba(15,23,42,0.9);
+            box-shadow:
+                0 8px 18px rgba(0,0,0,0.7),
+                0 0 0 1px rgba(15,23,42,0.9) inset;
         }
 
         .btn-secondary:hover:not(:disabled) {
-            background: rgba(219,234,254,0.9);
-            border-color: rgba(59,130,246,0.9);
+            background: rgba(239,246,255,0.9);
+            border-color: rgba(129,140,248,0.8);
+        }
+
+        :root[data-theme="dark"] .btn-secondary:hover:not(:disabled) {
+            background: rgba(30,64,175,0.65);
         }
 
         .btn-secondary:disabled {
@@ -360,8 +430,8 @@
             border: 1px solid var(--border);
             background: radial-gradient(circle at top,var(--bg-card),var(--bg-card-alt));
             box-shadow:
-                0 18px 40px rgba(15,23,42,0.12),
-                0 0 0 1px rgba(255,255,255,0.9) inset;
+                var(--shadow-soft),
+                0 0 0 1px rgba(15,23,42,0.02) inset;
             overflow: hidden;
             backdrop-filter: blur(26px);
         }
@@ -377,7 +447,6 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
-            background: var(--bg-header);
         }
 
         .card-header h2 {
@@ -402,28 +471,42 @@
         }
 
         thead {
-            background: #f3f4f6;
+            background: var(--bg-header);
         }
 
         th {
             padding: 10px 13px;
             font-size: 10px;
             text-transform: uppercase;
-            color: rgba(107,114,128,1);
+            color: rgba(148,163,184,0.9);
             letter-spacing: 0.08em;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
+            text-align: left;
         }
 
         td {
             padding: 9px 13px;
             font-size: 13px;
-            border-bottom: 1px solid rgba(229,231,235,0.9);
+            border-bottom: 1px solid var(--border-soft);
             white-space: nowrap;
         }
 
+        /* Column alignment tweaks */
+        th.col-network,
+        td.col-network,
+        th.col-lastseen,
+        td.col-lastseen {
+            text-align: center;
+        }
+
+        /* Hover – light vs dark */
         tr:hover {
-            background: rgba(219,234,254,0.75);
+            background: rgba(37,99,235,0.06);
+        }
+
+        :root[data-theme="dark"] tr:hover {
+            background: rgba(30,64,175,0.25);
         }
 
         .row-selectable {
@@ -431,7 +514,11 @@
         }
 
         .row-selected {
-            background: radial-gradient(circle at left,#dbeafe,#eff6ff) !important;
+            background: radial-gradient(circle at left,#1d4ed8,#e5e7eb) !important;
+        }
+
+        :root[data-theme="dark"] .row-selected {
+            background: radial-gradient(circle at left,#1d4ed8,#020617) !important;
         }
 
         .small { font-size: 12px; color: var(--text-muted); }
@@ -454,34 +541,43 @@
         }
 
         .badge-online {
-            background: rgba(52,199,89,0.14);
-            color: #166534;
-            border-color: rgba(52,199,89,0.5);
+            background: rgba(52,199,89,0.12);
+            color: var(--success);
+            border-color: rgba(52,199,89,0.55);
         }
         .badge-online .badge-dot {
             background: var(--success);
-            box-shadow: 0 0 10px rgba(52,199,89,0.8);
+            box-shadow: 0 0 12px rgba(52,199,89,0.9);
         }
 
         .badge-offline {
-            background: rgba(255,59,48,0.12);
-            color: #b91c1c;
-            border-color: rgba(239,68,68,0.5);
+            background: rgba(255,69,58,0.08);
+            color: var(--danger);
+            border-color: rgba(255,69,58,0.55);
         }
         .badge-offline .badge-dot {
             background: var(--danger);
         }
 
         .badge-net {
-            background: rgba(191,219,254,0.9);
+            background: rgba(37,99,235,0.12);
             color: #1d4ed8;
-            border-color: rgba(96,165,250,0.9);
+            border-color: rgba(96,165,250,0.7);
+        }
+
+        :root[data-theme="dark"] .badge-net {
+            background: rgba(37,99,235,0.22);
+            color: #bfdbfe;
         }
 
         .badge-pill-soft {
-            background: rgba(249,250,251,0.9);
+            background: rgba(15,23,42,0.03);
             border: 1px dashed var(--border-soft);
             color: var(--text-muted);
+        }
+
+        :root[data-theme="dark"] .badge-pill-soft {
+            background: rgba(15,23,42,0.8);
         }
 
         /* Temperature color classes */
@@ -517,7 +613,7 @@
             font-size: 11px;
             border: 1px dashed var(--border-soft);
             color: var(--text-muted);
-            background: rgba(249,250,251,0.9);
+            background: var(--bg-header);
         }
 
         .playlist-header-actions {
@@ -533,8 +629,8 @@
             max-width: 260px;
             padding: 5px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.8);
-            background: rgba(255,255,255,0.96);
+            border: 1px solid rgba(148,163,184,0.45);
+            background: var(--bg-header);
             color: var(--text);
             font-size: 12px;
             outline: none;
@@ -554,14 +650,26 @@
             gap: 10px;
         }
 
+        /* Code tag – styled per theme */
         code {
             font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas,
                          "Liberation Mono", "Courier New", monospace;
             font-size: 11px;
-            background: rgba(243,244,246,0.9);
             padding: 2px 5px;
             border-radius: 5px;
-            border: 1px solid rgba(209,213,219,0.9);
+            border: 1px solid rgba(148,163,184,0.35);
+        }
+
+        :root[data-theme="light"] code {
+            background: rgba(0,0,0,0.03);
+            color: #4b5563;
+            border-color: rgba(15,23,42,0.08);
+        }
+
+        :root[data-theme="dark"] code {
+            background: rgba(15,23,42,0.9);
+            color: #e5e7eb;
+            border-color: rgba(148,163,184,0.35);
         }
 
         @media (max-width: 960px) {
@@ -574,7 +682,7 @@
                 align-items: center;
                 gap: 10px;
                 border-right: none;
-                border-bottom: 1px solid rgba(148,163,184,0.25);
+                border-bottom: 1px solid var(--border);
             }
             .sidebar-nav {
                 flex-direction: row;
@@ -689,6 +797,7 @@
                         <span id="summary-text">Loading…</span>
                     </div>
 
+                    <button id="theme-toggle" class="btn-secondary">Light / Dark</button>
                     <button id="refresh-btn" class="btn">Refresh now</button>
                 </div>
             </header>
@@ -713,8 +822,10 @@
                             <th>Status</th>
                             <th>Temperature</th>
                             <th>Weather</th>
-                            <th>Network</th>
-                            <th style="min-width:160px;">Last Seen (UTC)</th>
+                            <th class="col-network">Network</th>
+                            <th class="col-lastseen">
+                                Last seen<br><span class="small">(local time)</span>
+                            </th>
                             <th>Location</th>
                         </tr>
                         </thead>
@@ -768,7 +879,7 @@
 
                                 <td><span class="small">loading…</span></td>
 
-                                <td>
+                                <td class="col-network">
                                     {% if p.network_type %}
                                         <span class="badge badge-net">{{ p.network_type }}</span>
                                     {% else %}
@@ -776,11 +887,10 @@
                                     {% endif %}
                                 </td>
 
-                                <td>
+                                <td class="col-lastseen">
                                     {% if p.last_seen %}
                                         <div class="small">
-                                            {{ p.last_seen.strftime("%Y-%m-%d") }}<br>
-                                            {{ p.last_seen.strftime("%H:%M:%S") }}
+                                            {{ p.last_seen.isoformat() }} <!-- JS će ovo preformatirati -->
                                         </div>
                                     {% else %}
                                         <span class="small">never</span>
@@ -899,24 +1009,82 @@
 
 <script>
     // ---------------------------
+    // THEME TOGGLE
+    // ---------------------------
+    const rootEl = document.documentElement;
+    const themeToggleBtn = document.getElementById("theme-toggle");
+
+    function applyTheme(theme) {
+        rootEl.setAttribute("data-theme", theme);
+    }
+
+    let currentTheme = localStorage.getItem("arenaTheme") || "light";
+    applyTheme(currentTheme);
+
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener("click", () => {
+            currentTheme = currentTheme === "light" ? "dark" : "light";
+            applyTheme(currentTheme);
+            localStorage.setItem("arenaTheme", currentTheme);
+        });
+    }
+
+    // ---------------------------
+    // Timezone helpers
+    // ---------------------------
+    const userTimeZone = (function () {
+        try {
+            return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+        } catch (e) {
+            return "UTC";
+        }
+    })();
+
+    const userTzAbbr = (function () {
+        try {
+            const s = new Date().toLocaleTimeString("en-US", {
+                timeZone: userTimeZone,
+                timeZoneName: "short"
+            });
+            const parts = s.split(" ");
+            return parts[parts.length - 1] || "UTC";
+        } catch (e) {
+            return "UTC";
+        }
+    })();
+
+    function formatLocalDateTime(isoString) {
+        if (!isoString) return null;
+        const d = new Date(isoString);
+        if (isNaN(d.getTime())) return null;
+
+        const dateStr = new Intl.DateTimeFormat(undefined, {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            timeZone: userTimeZone
+        }).format(d);
+
+        const timeStr = new Intl.DateTimeFormat(undefined, {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+            timeZone: userTimeZone
+        }).format(d);
+
+        return { dateStr, timeStr };
+    }
+
+    function formatLocalTimeLabel(dateObj) {
+        const info = formatLocalDateTime(dateObj.toISOString());
+        if (!info) return "";
+        return `${info.timeStr} ${userTzAbbr}`;
+    }
+
+    // ---------------------------
     // Helpers / globals
     // ---------------------------
-    function formatTime(date) {
-        const pad = (n) => n.toString().padStart(2, "0");
-        return (
-            pad(date.getUTCHours()) + ":" +
-            pad(date.getUTCMinutes()) + ":" +
-            pad(date.getUTCSeconds()) + " UTC"
-        );
-    }
-
-    function getTempClass(tempC) {
-        if (tempC === null || tempC === undefined) return "";
-        if (tempC < 55) return "temp-ok";
-        if (tempC < 70) return "temp-warn";
-        return "temp-hot";
-    }
-
     let selectedPlayerId = null;
     let selectedPlayerRow = null;
     let playlistsLoadedOnce = false;
@@ -1093,8 +1261,8 @@
 
             fetchPlayerPlaylist(playerId);
 
-            if (playlistId === null) {
-                if (select) select.value = "";
+            if (playlistId === null && select) {
+                select.value = "";
             }
         } catch (err) {
             console.error("Failed to update active playlist:", err);
@@ -1338,7 +1506,11 @@
             const tdTemp = document.createElement("td");
             if (p.temperature_c !== null && p.temperature_c !== undefined) {
                 const tempC = p.temperature_c;
-                const tempClass = getTempClass(tempC);
+                const tempClass = (function () {
+                    if (tempC < 55) return "temp-ok";
+                    if (tempC < 70) return "temp-warn";
+                    return "temp-hot";
+                })();
 
                 let displayTemp = tempC;
                 let unit = "°C";
@@ -1360,6 +1532,7 @@
             tr.appendChild(tdWeather);
 
             const tdNet = document.createElement("td");
+            tdNet.classList.add("col-network");
             if (p.network_type) {
                 tdNet.innerHTML = `
                     <span class="badge badge-net">${p.network_type}</span>
@@ -1370,27 +1543,18 @@
             tr.appendChild(tdNet);
 
             const tdLast = document.createElement("td");
+            tdLast.classList.add("col-lastseen");
             if (p.last_seen) {
-                let datePart = "";
-                let timePart = "";
-
-                try {
-                    const dt = new Date(p.last_seen);
-                    if (!isNaN(dt.getTime())) {
-                        datePart = dt.toISOString().split("T")[0];
-                        timePart = dt.toTimeString().split(" ")[0];
-                    } else {
-                        datePart = p.last_seen;
-                    }
-                } catch (err) {
-                    datePart = p.last_seen;
+                const info = formatLocalDateTime(p.last_seen);
+                if (info) {
+                    tdLast.innerHTML = `
+                        <div class="small">
+                            ${info.dateStr}<br>${info.timeStr} ${userTzAbbr}
+                        </div>
+                    `;
+                } else {
+                    tdLast.innerHTML = `<span class="small">never</span>`;
                 }
-
-                tdLast.innerHTML = `
-                    <div class="small">
-                        ${datePart}${timePart ? "<br>" + timePart : ""}
-                    </div>
-                `;
             } else {
                 tdLast.innerHTML = `<span class="small">never</span>`;
             }
@@ -1441,8 +1605,8 @@
             renderPlayers(data);
 
             const now = new Date();
-            document.getElementById("last-refresh-label").textContent =
-                "Last refresh: " + formatTime(now);
+            const label = document.getElementById("last-refresh-label");
+            label.textContent = "Last refresh: " + formatLocalTimeLabel(now);
         } catch (err) {
             console.error("Failed to refresh player status:", err);
             document.getElementById("summary-text").textContent =
