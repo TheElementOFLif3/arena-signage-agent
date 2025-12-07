@@ -10,11 +10,24 @@ from .routers import countries, players, playlists
 
 
 # ----------------------------------------------------
-# Create database tables on startup (development only)
+# FastAPI app
 # ----------------------------------------------------
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="ArenaSignage API")
+
+
+# ----------------------------------------------------
+# Database init (development only)
+# ----------------------------------------------------
+@app.on_event("startup")
+def on_startup() -> None:
+    """
+    Create database tables on application startup.
+
+    NOTE:
+    This is convenient for local development and small deployments.
+    For production you would normally use Alembic migrations instead.
+    """
+    Base.metadata.create_all(bind=engine)
 
 
 # ----------------------------------------------------
@@ -53,7 +66,9 @@ def favicon():
 @app.get("/dashboard", response_class=HTMLResponse, tags=["dashboard"])
 def dashboard(request: Request, db: Session = Depends(get_db)):
     """
-    Render the dashboard HTML page and inject all players.
+    Render the dashboard HTML page and inject all players
+    for initial render. The JS on the page then keeps
+    the table in sync via /players/status.
     """
     players = db.query(Player).all()
     return templates.TemplateResponse(
@@ -65,13 +80,13 @@ def dashboard(request: Request, db: Session = Depends(get_db)):
 # ----------------------------------------------------
 # Health check endpoint
 # ----------------------------------------------------
-@app.get("/health")
+@app.get("/health", tags=["system"])
 def health():
     return {"status": "ok"}
 
 
 # ----------------------------------------------------
-# Root endpoint (hidden)
+# Root endpoint (hidden from docs)
 # ----------------------------------------------------
 @app.get("/", include_in_schema=False)
 def root():

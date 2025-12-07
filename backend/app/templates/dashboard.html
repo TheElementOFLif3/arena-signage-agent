@@ -963,7 +963,7 @@
                                     {% if p.last_seen %}
                                         <div class="small">
                                             {{ p.last_seen.strftime("%Y-%m-%d") }}<br>
-                                            {{ p.last_seen.strftime("%H:%M:%S") }} UTC
+                                            {{ p.last_seen.strftime("%H:%M:%S") }}
                                         </div>
                                     {% else %}
                                         <span class="small">never</span>
@@ -1068,7 +1068,8 @@
                     <code>/players/&lt;id&gt;/weather</code>,
                     <code>/players/&lt;id&gt;/playlist</code>,
                     <code>/players/&lt;id&gt;/active-playlist</code>,
-                    <code>/playlists/</code>
+                    <code>/playlists/</code>,
+                    <code>/playlists/effective/by-player/&lt;player_id&gt;</code>
                 </span>
 
                 <span id="auto-refresh-label">
@@ -1112,7 +1113,7 @@
     }
 
     let selectedPlayerId = null;
-    let selectedPlayerRow = null;
+       let selectedPlayerRow = null;
     let playlistsLoadedOnce = false;
     let allPlaylistsCache = null;
 
@@ -1600,7 +1601,30 @@
                         second: "2-digit",
                         timeZone: userTimeZone
                     });
-                    const [datePart, timePart] = formatted.split(",").map(s => s.trim());
+                    const parts = formatted.split(",");
+                    let datePart = "";
+                    let timePart = "";
+
+                    if (parts.length === 2) {
+                        datePart = parts[0].trim();
+                        timePart = parts[1].trim();
+                    } else {
+                        // Fallback if locale uses different separators
+                        datePart = dt.toLocaleDateString(locale, {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            timeZone: userTimeZone
+                        });
+                        timePart = dt.toLocaleTimeString(locale, {
+                            hour12: false,
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            timeZone: userTimeZone
+                        });
+                    }
+
                     tdLast.innerHTML = `
                         <div class="small">
                             ${datePart}<br>${timePart} ${timeZoneShort}
