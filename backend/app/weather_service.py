@@ -13,7 +13,11 @@ from retry_requests import retry
 # Open-Meteo client + caching
 # -----------------------------
 # Cache HTTP responses on disk for 1h to avoid API spam
-_cache_session = requests_cache.CachedSession(".cache", expire_after=3600)
+# Use in-memory cache in Docker to avoid filesystem permission issues
+_cache_session = requests_cache.CachedSession(
+    backend="memory",
+    expire_after=3600,
+)
 _retry_session = retry(_cache_session, retries=5, backoff_factor=0.2)
 
 openmeteo = openmeteo_requests.Client(session=_retry_session)

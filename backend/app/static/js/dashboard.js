@@ -1,6 +1,37 @@
 // ---------------------------
 // Helpers / globals
 // ---------------------------
+
+// Used to show nice local times in "Last seen" column
+let userTimeZone = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "Local";
+let timeZoneShort = "LOCAL TIME";
+
+try {
+    const now = new Date();
+    const locale = navigator.language || "en-US";
+    const parts = new Intl.DateTimeFormat(locale, {
+        timeZone: userTimeZone,
+        timeZoneName: "short"
+    }).formatToParts(now);
+    const tzPart = parts.find(p => p.type === "timeZoneName");
+    if (tzPart && tzPart.value) {
+        timeZoneShort = tzPart.value;
+    }
+} catch (err) {
+    console.warn("Failed to resolve time zone name, using fallback.", err);
+}
+
+// Currently selected player
+let selectedPlayerId = null;
+let selectedPlayerRow = null;
+
+// Playlist caches
+let playlistsLoadedOnce = false;
+let allPlaylistsCache = null;
+
+// ---------------------------
+// Generic helpers
+// ---------------------------
 function showSkeletonRows() {
     const tbody = document.querySelector("#players-table tbody");
     if (!tbody) return;
@@ -26,29 +57,6 @@ function getTempClass(tempC) {
     if (tempC < 55) return "temp-ok";
     if (tempC < 70) return "temp-warn";
     return "temp-hot";
-}
-
-let selectedPlayerId = null;
-let selectedPlayerRow = null;
-let playlistsLoadedOnce = false;
-let allPlaylistsCache = null;
-
-let userTimeZone = (Intl.DateTimeFormat().resolvedOptions().timeZone) || "Local";
-let timeZoneShort = "LOCAL TIME";
-
-try {
-    const now = new Date();
-    const locale = navigator.language || "en-US";
-    const parts = new Intl.DateTimeFormat(locale, {
-        timeZone: userTimeZone,
-        timeZoneName: "short"
-    }).formatToParts(now);
-    const tzPart = parts.find(p => p.type === "timeZoneName");
-    if (tzPart && tzPart.value) {
-        timeZoneShort = tzPart.value;
-    }
-} catch (err) {
-    console.warn("Failed to resolve time zone name, using fallback.", err);
 }
 
 function formatLastRefresh(date) {
@@ -95,7 +103,7 @@ function setPlaylistControlsEnabled(enabled) {
 }
 
 // ---------------------------
-// Weather
+// Weather per player
 // ---------------------------
 async function fetchPlayerWeather(player, cell) {
     if (!player.city || !player.country_code) {
@@ -427,7 +435,7 @@ function handlePlayerRowClick(player) {
 }
 
 // ---------------------------
-// Render players
+// Render players table
 // ---------------------------
 function renderPlayers(players) {
     const tbody = document.querySelector("#players-table tbody");
@@ -441,10 +449,12 @@ function renderPlayers(players) {
         tr.setAttribute("data-player-id", p.id);
         if (p.is_online) onlineCount++;
 
+        // ID
         const tdId = document.createElement("td");
         tdId.textContent = p.id;
         tr.appendChild(tdId);
 
+        // Player name + device id
         const tdPlayer = document.createElement("td");
         tdPlayer.innerHTML = `
             <div>${p.name}</div>
@@ -452,6 +462,7 @@ function renderPlayers(players) {
         `;
         tr.appendChild(tdPlayer);
 
+        // Status
         const tdStatus = document.createElement("td");
         if (p.is_online) {
             tdStatus.innerHTML = `
@@ -468,6 +479,7 @@ function renderPlayers(players) {
         }
         tr.appendChild(tdStatus);
 
+        // Temperature
         const tdTemp = document.createElement("td");
         if (p.temperature_c !== null && p.temperature_c !== undefined) {
             const tempC = p.temperature_c;
@@ -488,10 +500,12 @@ function renderPlayers(players) {
         }
         tr.appendChild(tdTemp);
 
+        // Weather (async)
         const tdWeather = document.createElement("td");
         tdWeather.innerHTML = `<span class="small">loading…</span>`;
         tr.appendChild(tdWeather);
 
+        // Network type
         const tdNet = document.createElement("td");
         if (p.network_type) {
             tdNet.innerHTML = `
@@ -502,6 +516,7 @@ function renderPlayers(players) {
         }
         tr.appendChild(tdNet);
 
+        // Last seen (converted to local time)
         const tdLast = document.createElement("td");
         if (p.last_seen) {
             try {
@@ -517,7 +532,9 @@ function renderPlayers(players) {
                     second: "2-digit",
                     timeZone: userTimeZone
                 });
-                const [datePart, timePart] = formatted.split(",").map(s => s.trim());
+                const parts = formatted.split(",").map(s => s.trim());
+                const datePart = parts[0];
+                const timePart = parts[1] || "";
                 tdLast.innerHTML = `
                     <div class="small">
                         ${datePart}<br>${timePart} ${timeZoneShort}
@@ -532,6 +549,7 @@ function renderPlayers(players) {
         }
         tr.appendChild(tdLast);
 
+        // Location
         const tdLoc = document.createElement("td");
         const city = p.city || "Unknown";
         const arena = p.arena_name ? " – " + p.arena_name : "";
@@ -567,8 +585,10 @@ async function refreshStatus() {
     showSkeletonRows();
 
     try {
-        btn.disabled = true;
-        btn.textContent = "Refreshing…";
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = "Refreshing…";
+        }
 
         const resp = await fetch("/players/status");
         if (!resp.ok) throw new Error("HTTP " + resp.status);
@@ -593,8 +613,10 @@ async function refreshStatus() {
             </tr>
         `;
     } finally {
-        btn.disabled = false;
-        btn.textContent = "Refresh now";
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = "Refresh now";
+        }
     }
 }
 
@@ -708,14 +730,53 @@ async function refreshPlaylists() {
 }
 
 // ---------------------------
+// Simple playlist creation dialog
+// ---------------------------
+async function createPlaylistQuick() {
+    const name = prompt("Playlist name:");
+    if (!name) {
+        return; // User cancelled or empty
+    }
+
+    const description = prompt("Short description (optional):") || "";
+
+    try {
+        const resp = await fetch("/playlists/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name: name,
+                description: description,
+                is_active: true
+            }),
+        });
+
+        if (!resp.ok) {
+            const text = await resp.text();
+            console.error("Create playlist failed:", resp.status, text);
+            alert("Failed to create playlist (" + resp.status + ").");
+            return;
+        }
+
+        const created = await resp.json();
+        console.log("Created playlist:", created);
+
+        await refreshPlaylists();
+
+        alert(`Playlist "${created.name}" (#${created.id}) created.`);
+    } catch (err) {
+        console.error("Error creating playlist:", err);
+        alert("Error creating playlist – check console/logs.");
+    }
+}
+
+// ---------------------------
 // View switching (sidebar + top tabs)
 // ---------------------------
 function showView(view) {
     const playersView = document.getElementById("players-view");
     const playerPlaylistView = document.getElementById("player-playlist-view");
     const playlistsView = document.getElementById("playlists-view");
-
-    if (!playersView || !playerPlaylistView || !playlistsView) return;
 
     if (view === "players") {
         playersView.style.display = "";
@@ -748,7 +809,7 @@ function showView(view) {
 }
 
 // ---------------------------
-// THEME HANDLING
+// Theme handling
 // ---------------------------
 function applyTheme(theme) {
     const body = document.body;
@@ -781,31 +842,38 @@ function initTheme() {
 }
 
 // ---------------------------
-// Event wiring / bootstrap
+// Wire up events (runs on load)
 // ---------------------------
 window.addEventListener("load", () => {
+    // Init theme and labels
     initTheme();
-    showView("players");
-    setPlaylistControlsEnabled(false);
 
-    // Buttons
+    const headerLabel = document.getElementById("last-seen-header-label");
+    if (headerLabel) {
+        headerLabel.textContent = `(${timeZoneShort})`;
+    }
+
+    const autoLabel = document.getElementById("auto-refresh-label");
+    if (autoLabel) {
+        autoLabel.textContent = "Auto-refresh: every 5 minutes (players)";
+    }
+
+    // Manual refresh button
     const refreshBtn = document.getElementById("refresh-btn");
     if (refreshBtn) {
         refreshBtn.addEventListener("click", refreshStatus);
     }
 
-    const playlistsReloadBtn = document.getElementById("playlists-refresh-btn");
-    if (playlistsReloadBtn) {
-        playlistsReloadBtn.addEventListener("click", refreshPlaylists);
-    }
-
-    const playlistsNewBtn = document.getElementById("playlists-new-btn");
-    if (playlistsNewBtn) {
-        playlistsNewBtn.addEventListener("click", () => {
-            alert("Playlist editor is not implemented yet. Layout only for now.");
+    // Theme toggle
+    const themeBtn = document.getElementById("theme-toggle-btn");
+    if (themeBtn) {
+        themeBtn.addEventListener("click", () => {
+            const cur = document.body.getAttribute("data-theme") || "light";
+            applyTheme(cur === "light" ? "dark" : "light");
         });
     }
 
+    // Playlist panel buttons
     const playlistRefreshBtn = document.getElementById("playlist-refresh-btn");
     if (playlistRefreshBtn) {
         playlistRefreshBtn.addEventListener("click", () => {
@@ -835,6 +903,20 @@ window.addEventListener("load", () => {
         });
     }
 
+    // Playlists tab buttons
+    const playlistsReloadBtn = document.getElementById("playlists-refresh-btn");
+    if (playlistsReloadBtn) {
+        playlistsReloadBtn.addEventListener("click", refreshPlaylists);
+    }
+
+    const playlistsNewBtn = document.getElementById("playlists-new-btn");
+    if (playlistsNewBtn) {
+        playlistsNewBtn.addEventListener("click", () => {
+            createPlaylistQuick();
+        });
+    }
+
+    // Sidebar + top tabs
     document.querySelectorAll(".nav-tab[data-view]").forEach((btn) => {
         btn.addEventListener("click", () => {
             if (btn.disabled) return;
@@ -852,33 +934,15 @@ window.addEventListener("load", () => {
         });
     });
 
-    const themeToggleBtn = document.getElementById("theme-toggle-btn");
-    if (themeToggleBtn) {
-        themeToggleBtn.addEventListener("click", () => {
-            const cur = document.body.getAttribute("data-theme") || "light";
-            applyTheme(cur === "light" ? "dark" : "light");
-        });
-    }
-
-    // Header timezone label
-    const headerLabel = document.getElementById("last-seen-header-label");
-    if (headerLabel) {
-        headerLabel.textContent = `(${timeZoneShort})`;
-    }
-
-    // Auto-refresh label (5 minutes)
-    const autoRefreshLabel = document.getElementById("auto-refresh-label");
-    if (autoRefreshLabel) {
-        autoRefreshLabel.textContent = "Auto-refresh: every 5 minutes (players)";
-    }
-
-    // Initial load
+    // Initial state
+    showView("players");
+    setPlaylistControlsEnabled(false);
     refreshStatus();
 
-    // Auto-refresh every 5 minutes (300000 ms)
+    // Auto-refresh every 5 minutes
     setInterval(() => {
         const pv = document.getElementById("players-view");
-        if (pv && pv.style.display === "none") return;
+        if (!pv || pv.style.display === "none") return;
         refreshStatus();
-    }, 300000);
+    }, 5 * 60 * 1000); // 5 minutes
 });

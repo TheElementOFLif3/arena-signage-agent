@@ -1,3 +1,4 @@
+version: "3.9"
 
 services:
   db:
@@ -14,6 +15,7 @@ services:
 
   backend:
     build: ./backend
+    container_name: arena-signage-backend
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql+psycopg2://signage:signage_pass@db:5432/signage
@@ -21,6 +23,8 @@ services:
       - db
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
 
 volumes:
   db_data:

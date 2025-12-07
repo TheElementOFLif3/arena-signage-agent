@@ -15,6 +15,7 @@ router = APIRouter(
 # Helper functions
 # =====================================================
 
+
 def _get_playlist_or_404(playlist_id: int, db: Session) -> models.Playlist:
     """
     Load a playlist with its items or raise 404 if not found.
@@ -137,6 +138,7 @@ def _get_group_playlist_link_or_404(
 # Effective playlist builder
 # =====================================================
 
+
 def _build_effective_playlist_for_player(
     player: models.Player,
     db: Session,
@@ -249,6 +251,7 @@ def _build_effective_playlist_for_player(
 # =====================================================
 # Playlist CRUD
 # =====================================================
+
 
 @router.post(
     "/",
@@ -363,6 +366,7 @@ def delete_playlist(
 # Playlist Items
 # =====================================================
 
+
 @router.post(
     "/{playlist_id}/items",
     response_model=schemas.PlaylistItemRead,
@@ -465,6 +469,7 @@ def delete_playlist_item(
 # =====================================================
 # Player ↔ Playlist links
 # =====================================================
+
 
 @router.post(
     "/player-links",
@@ -578,6 +583,7 @@ def delete_player_playlist_link(
 # Group ↔ Playlist links
 # =====================================================
 
+
 @router.post(
     "/group-links",
     response_model=schemas.GroupPlaylistRead,
@@ -686,8 +692,9 @@ def delete_group_playlist_link(
 
 
 # =====================================================
-# Effective playlist endpoint
+# Effective playlist endpoint (for Pi agent)
 # =====================================================
+
 
 @router.get(
     "/effective/by-player/{player_id}",
@@ -704,11 +711,10 @@ def get_effective_playlist_for_player(
       - PlayerPlaylist links (directly assigned playlists)
       - GroupPlaylist links (playlists assigned to the player's group)
 
-    The Pi agent can call this endpoint and iterate over `entries`
+    The Raspberry Pi agent can call this endpoint and iterate over `entries`
     to know exactly which slides to play, in which order.
     """
     player = _get_player_or_404(player_id, db)
-
     entries = _build_effective_playlist_for_player(player, db)
 
     return schemas.EffectivePlaylistResponse(
@@ -716,132 +722,3 @@ def get_effective_playlist_for_player(
         group_id=player.group_id,
         entries=entries,
     )
-# =====================================================
-# Effective playlists for a player (player + group)
-# =====================================================
-
-@router.get(
-    "/effective/by-player/{player_id}",
-    status_code=status.HTTP_200_OK,
-)
-def get_effective_playlists_for_player(
-    player_id: int,
-    db: Session = Depends(get_db),
-):
-    """
-    Compute the effective playlist set for a player.
-
-    Includes:
-    - all active player-playlist links attached directly to this player
-    - all active group-playlist links from the player's group (if any)
-
-    The response is a compact JSON blob tailored for the Raspberry Pi agent.
-    """
-    # Load player with:
-    # - primary group
-    # - direct player_playlists + nested playlist + items
-    player = (
-        db.query(models.Player)
-        .options(
-            joinedload(models.Player.group),
-            joinedload(models.Player.player_playlists)
-            .joinedload(models.PlayerPlaylist.playlist)
-            .joinedload(models.Playlist.items),
-        )
-        .filter(models.Player.id == player_id)
-        .first()
-    )
-
-    if not player:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Player not found.",
-        )
-
-    entries = []
-
-    # -------------------------------------------------
-    # 1) Player-level playlists
-    # -------------------------------------------------
-    for link in sorted(player.player_playlists, key=lambda l: l.order_index):
-        playlist = link.playlist
-        if not playlist:
-            continue
-        if not link.is_active or not playlist.is_active:
-            continue
-
-        items = sorted(playlist.items, key=lambda it: it.order_index)
-
-        entries.append(
-            {
-                "playlist_id": playlist.id,
-                "playlist_name": playlist.name,
-                "source": "player",
-                "link_id": link.id,
-                "order_index": link.order_index,
-                "is_active": link.is_active,
-                "items": [
-                    {
-                        "id": item.id,
-                        "playlist_id": item.playlist_id,
-                        "title": item.title,
-                        "media_url": item.media_url,
-                        "duration_seconds": item.duration_seconds,
-                        "order_index": item.order_index,
-                    }
-                    for item in items
-                ],
-            }
-        )
-
-    # -------------------------------------------------
-    # 2) Group-level playlists (if player is in a group)
-    # -------------------------------------------------
-    if player.group_id is not None:
-        group_links = (
-            db.query(models.GroupPlaylist)
-            .options(
-                joinedload(models.GroupPlaylist.playlist)
-                .joinedload(models.Playlist.items)
-            )
-            .filter(models.GroupPlaylist.group_id == player.group_id)
-            .all()
-        )
-
-        for link in sorted(group_links, key=lambda l: l.order_index):
-            playlist = link.playlist
-            if not playlist:
-                continue
-            if not link.is_active or not playlist.is_active:
-                continue
-
-            items = sorted(playlist.items, key=lambda it: it.order_index)
-
-            entries.append(
-                {
-                    "playlist_id": playlist.id,
-                    "playlist_name": playlist.name,
-                    "source": "group",
-                    "link_id": link.id,
-                    "order_index": link.order_index,
-                    "is_active": link.is_active,
-                    "items": [
-                        {
-                            "id": item.id,
-                            "playlist_id": item.playlist_id,
-                            "title": item.title,
-                            "media_url": item.media_url,
-                            "duration_seconds": item.duration_seconds,
-                            "order_index": item.order_index,
-                        }
-                        for item in items
-                    ],
-                }
-            )
-
-    # Final JSON object consumed by pi_agent.py
-    return {
-        "player_id": player.id,
-        "group_id": player.group_id,
-        "entries": entries,
-    }
