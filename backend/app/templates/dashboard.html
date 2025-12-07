@@ -5,32 +5,32 @@
     <title>ArenaSignage – Control Panel</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <!-- macOS App Store style – dark glass -->
+    <!-- macOS App Store style – LIGHT Apple Glass -->
     <style>
         /* ---------------------------
-           GLOBAL THEME (dark Apple style)
+           GLOBAL THEME (light Apple style)
         ---------------------------- */
         :root {
-            --bg: #050509;
-            --bg-elevated: #111118;
-            --bg-elevated-soft: #151520;
-            --bg-sidebar: #08080f;
-            --bg-card: rgba(18,18,26,0.98);
-            --bg-card-alt: rgba(25,25,36,0.98);
-            --bg-header: rgba(28,28,40,0.96);
+            --bg: #f5f5f7;
+            --bg-elevated: #ffffff;
+            --bg-elevated-soft: #f9fafb;
+            --bg-sidebar: rgba(255,255,255,0.88);
+            --bg-card: rgba(255,255,255,0.95);
+            --bg-card-alt: rgba(248,249,252,0.98);
+            --bg-header: rgba(250,250,252,0.96);
 
-            --border: rgba(255,255,255,0.06);
-            --border-soft: rgba(255,255,255,0.03);
+            --border: rgba(15,23,42,0.08);
+            --border-soft: rgba(148,163,184,0.25);
 
-            --text: #f9fafb;
-            --text-muted: #9ca3af;
+            --text: #111827;
+            --text-muted: #6b7280;
 
             --accent: #0a84ff;
-            --accent-soft: rgba(10,132,255,0.25);
+            --accent-soft: rgba(10,132,255,0.15);
 
             --success: #34c759;
-            --danger: #ff453a;
-            --warning: #ffd60a;
+            --danger: #ff3b30;
+            --warning: #ffcc00;
         }
 
         * {
@@ -42,7 +42,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
                          "Segoe UI", sans-serif;
             background:
-                radial-gradient(circle at top, #1a1a24 0%, #050509 45%, #020206 100%);
+                radial-gradient(circle at top, #ffffff 0%, #f5f5f7 45%, #e5e7eb 100%);
             color: var(--text);
             -webkit-font-smoothing: antialiased;
         }
@@ -60,10 +60,10 @@
             border-radius: 26px;
             overflow: hidden;
 
-            background: radial-gradient(circle at top left,#151521,#050509 45%,#050509 100%);
+            background: radial-gradient(circle at top left,#ffffff,#f3f4f6 55%,#e5e7eb 100%);
             box-shadow:
-                0 40px 90px rgba(0,0,0,0.85),
-                0 0 0 1px rgba(255,255,255,0.05);
+                0 40px 90px rgba(15,23,42,0.20),
+                0 0 0 1px rgba(148,163,184,0.25);
             display: flex;
         }
 
@@ -72,8 +72,8 @@
         ---------------------------- */
         .sidebar {
             width: 240px;
-            background: linear-gradient(180deg,#080811,#050509);
-            border-right: 1px solid rgba(255,255,255,0.06);
+            background: linear-gradient(180deg,#fdfdfd,#f3f4f6);
+            border-right: 1px solid rgba(148,163,184,0.25);
             display: flex;
             flex-direction: column;
             padding: 12px 10px;
@@ -111,15 +111,15 @@
             width: 100%;
             padding: 6px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(255,255,255,0.06);
-            background: rgba(15,15,24,0.9);
+            border: 1px solid rgba(148,163,184,0.4);
+            background: rgba(255,255,255,0.92);
             color: var(--text);
             font-size: 12px;
             outline: none;
         }
 
         .sidebar-search input::placeholder {
-            color: rgba(148,163,184,0.8);
+            color: rgba(148,163,184,0.9);
         }
 
         .sidebar-section-title {
@@ -127,7 +127,7 @@
             font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.14em;
-            color: rgba(148,163,184,0.8);
+            color: rgba(107,114,128,0.9);
         }
 
         .sidebar-nav {
@@ -161,29 +161,29 @@
             width: 9px;
             height: 9px;
             border-radius: 999px;
-            background: rgba(148,163,184,0.6);
+            background: rgba(148,163,184,0.7);
         }
 
         .nav-tab:hover {
-            background: rgba(31,41,55,0.55);
+            background: rgba(243,244,246,0.9);
         }
 
         .nav-tab-active {
-            background: radial-gradient(circle at top left,#2563eb,#0b172a);
-            color: #e5f0ff;
-            border-color: rgba(129,140,248,0.9);
+            background: radial-gradient(circle at top left,#2563eb,#60a5fa);
+            color: #f9fafb;
+            border-color: rgba(37,99,235,0.9);
             box-shadow:
-                0 12px 25px rgba(37,99,235,0.55),
-                0 0 0 1px rgba(15,23,42,0.9) inset;
+                0 12px 25px rgba(37,99,235,0.35),
+                0 0 0 1px rgba(15,23,42,0.05) inset;
         }
 
         .nav-tab-active span.dot {
-            background: #60a5fa;
-            box-shadow: 0 0 12px rgba(56,189,248,0.9);
+            background: #e0f2fe;
+            box-shadow: 0 0 12px rgba(56,189,248,0.8);
         }
 
         .nav-tab-disabled {
-            opacity: 0.35;
+            opacity: 0.4;
             cursor: default;
         }
 
@@ -206,7 +206,7 @@
             font-size: 14px;
             font-weight: 600;
             color: white;
-            box-shadow: 0 0 12px rgba(236,72,153,0.9);
+            box-shadow: 0 0 12px rgba(236,72,153,0.7);
         }
 
         .sidebar-user-info {
@@ -230,7 +230,7 @@
             display: flex;
             flex-direction: column;
             padding: 14px 18px 14px 14px;
-            background: radial-gradient(circle at top,#151521,#050509 55%);
+            background: radial-gradient(circle at top,#ffffff,#f3f4f6 55%);
         }
 
         .top-strip {
@@ -245,8 +245,8 @@
         .top-strip span.pill {
             padding: 3px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.3);
-            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(148,163,184,0.5);
+            background: rgba(255,255,255,0.9);
         }
 
         .header {
@@ -282,12 +282,12 @@
             font-size: 11px;
 
             border-radius: 999px;
-            background: rgba(17,24,39,0.9);
-            border: 1px solid var(--border-soft);
+            background: rgba(255,255,255,0.95);
+            border: 1px solid rgba(209,213,219,0.9);
 
             box-shadow:
-                0 0 0 1px rgba(15,23,42,0.9),
-                0 8px 18px rgba(0,0,0,0.65);
+                0 8px 18px rgba(148,163,184,0.35),
+                0 0 0 1px rgba(243,244,246,0.9) inset;
         }
 
         .pill-dot {
@@ -295,22 +295,22 @@
             height: 8px;
             background: var(--success);
             border-radius: 999px;
-            box-shadow: 0 0 8px rgba(52,199,89,0.9);
+            box-shadow: 0 0 8px rgba(52,199,89,0.8);
         }
 
         .btn {
             padding: 6px 16px;
             border-radius: 999px;
-            border: 1px solid rgba(96,165,250,0.9);
-            background: radial-gradient(circle at top,#3b82f6,#0b1120);
-            color: #e5f0ff;
+            border: 1px solid rgba(37,99,235,0.9);
+            background: radial-gradient(circle at top,#3b82f6,#2563eb);
+            color: #f9fafb;
             font-weight: 500;
             font-size: 13px;
             cursor: pointer;
 
             box-shadow:
-                0 14px 28px rgba(37,99,235,0.7),
-                0 0 0 1px rgba(15,23,42,0.9) inset;
+                0 14px 28px rgba(37,99,235,0.35),
+                0 0 0 1px rgba(15,23,42,0.05) inset;
 
             transition: 0.1s;
         }
@@ -321,8 +321,8 @@
         .btn:active:not(:disabled) {
             transform: translateY(0);
             box-shadow:
-                0 8px 16px rgba(15,23,42,0.9),
-                0 0 0 1px rgba(15,23,42,0.9) inset;
+                0 8px 16px rgba(37,99,235,0.3),
+                0 0 0 1px rgba(15,23,42,0.08) inset;
         }
         .btn:disabled {
             opacity: 0.6;
@@ -332,19 +332,19 @@
         .btn-secondary {
             padding: 5px 13px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.35);
-            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.7);
+            background: rgba(255,255,255,0.95);
             color: var(--text);
             font-size: 12px;
             cursor: pointer;
             box-shadow:
-                0 8px 18px rgba(0,0,0,0.7),
-                0 0 0 1px rgba(15,23,42,0.9) inset;
+                0 8px 18px rgba(148,163,184,0.25),
+                0 0 0 1px rgba(243,244,246,0.9) inset;
         }
 
         .btn-secondary:hover:not(:disabled) {
-            background: rgba(30,64,175,0.65);
-            border-color: rgba(129,140,248,0.8);
+            background: rgba(219,234,254,0.9);
+            border-color: rgba(59,130,246,0.9);
         }
 
         .btn-secondary:disabled {
@@ -360,8 +360,8 @@
             border: 1px solid var(--border);
             background: radial-gradient(circle at top,var(--bg-card),var(--bg-card-alt));
             box-shadow:
-                0 24px 50px rgba(0,0,0,0.85),
-                0 0 0 1px rgba(15,23,42,0.9) inset;
+                0 18px 40px rgba(15,23,42,0.12),
+                0 0 0 1px rgba(255,255,255,0.9) inset;
             overflow: hidden;
             backdrop-filter: blur(26px);
         }
@@ -377,6 +377,7 @@
             justify-content: space-between;
             align-items: center;
             gap: 10px;
+            background: var(--bg-header);
         }
 
         .card-header h2 {
@@ -401,14 +402,14 @@
         }
 
         thead {
-            background: rgba(15,23,42,0.9);
+            background: #f3f4f6;
         }
 
         th {
             padding: 10px 13px;
             font-size: 10px;
             text-transform: uppercase;
-            color: rgba(148,163,184,0.9);
+            color: rgba(107,114,128,1);
             letter-spacing: 0.08em;
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
@@ -417,12 +418,12 @@
         td {
             padding: 9px 13px;
             font-size: 13px;
-            border-bottom: 1px solid var(--border-soft);
+            border-bottom: 1px solid rgba(229,231,235,0.9);
             white-space: nowrap;
         }
 
         tr:hover {
-            background: rgba(30,64,175,0.25);
+            background: rgba(219,234,254,0.75);
         }
 
         .row-selectable {
@@ -430,7 +431,7 @@
         }
 
         .row-selected {
-            background: radial-gradient(circle at left,#1d4ed8,#020617) !important;
+            background: radial-gradient(circle at left,#dbeafe,#eff6ff) !important;
         }
 
         .small { font-size: 12px; color: var(--text-muted); }
@@ -453,32 +454,32 @@
         }
 
         .badge-online {
-            background: rgba(52,199,89,0.18);
-            color: var(--success);
-            border-color: rgba(52,199,89,0.55);
+            background: rgba(52,199,89,0.14);
+            color: #166534;
+            border-color: rgba(52,199,89,0.5);
         }
         .badge-online .badge-dot {
             background: var(--success);
-            box-shadow: 0 0 12px rgba(52,199,89,0.9);
+            box-shadow: 0 0 10px rgba(52,199,89,0.8);
         }
 
         .badge-offline {
-            background: rgba(255,69,58,0.18);
-            color: var(--danger);
-            border-color: rgba(255,69,58,0.55);
+            background: rgba(255,59,48,0.12);
+            color: #b91c1c;
+            border-color: rgba(239,68,68,0.5);
         }
         .badge-offline .badge-dot {
             background: var(--danger);
         }
 
         .badge-net {
-            background: rgba(37,99,235,0.22);
-            color: #bfdbfe;
-            border-color: rgba(96,165,250,0.7);
+            background: rgba(191,219,254,0.9);
+            color: #1d4ed8;
+            border-color: rgba(96,165,250,0.9);
         }
 
         .badge-pill-soft {
-            background: rgba(15,23,42,0.8);
+            background: rgba(249,250,251,0.9);
             border: 1px dashed var(--border-soft);
             color: var(--text-muted);
         }
@@ -516,7 +517,7 @@
             font-size: 11px;
             border: 1px dashed var(--border-soft);
             color: var(--text-muted);
-            background: rgba(15,23,42,0.9);
+            background: rgba(249,250,251,0.9);
         }
 
         .playlist-header-actions {
@@ -532,8 +533,8 @@
             max-width: 260px;
             padding: 5px 10px;
             border-radius: 999px;
-            border: 1px solid rgba(148,163,184,0.45);
-            background: rgba(15,23,42,0.95);
+            border: 1px solid rgba(148,163,184,0.8);
+            background: rgba(255,255,255,0.96);
             color: var(--text);
             font-size: 12px;
             outline: none;
@@ -557,10 +558,10 @@
             font-family: SFMono-Regular, ui-monospace, Menlo, Monaco, Consolas,
                          "Liberation Mono", "Courier New", monospace;
             font-size: 11px;
-            background: rgba(15,23,42,0.9);
+            background: rgba(243,244,246,0.9);
             padding: 2px 5px;
             border-radius: 5px;
-            border: 1px solid rgba(148,163,184,0.35);
+            border: 1px solid rgba(209,213,219,0.9);
         }
 
         @media (max-width: 960px) {
@@ -573,7 +574,7 @@
                 align-items: center;
                 gap: 10px;
                 border-right: none;
-                border-bottom: 1px solid rgba(255,255,255,0.08);
+                border-bottom: 1px solid rgba(148,163,184,0.25);
             }
             .sidebar-nav {
                 flex-direction: row;
@@ -605,7 +606,7 @@
     <div class="shell">
 
         <!-- ===============================
-             SIDEBAR (like App Store / Storage)
+             SIDEBAR
              =============================== -->
         <aside class="sidebar">
             <div class="sidebar-header">
@@ -803,7 +804,7 @@
                 </div>
             </section>
 
-            <!-- SELECTED PLAYER PLAYLIST (WITH ASSIGN CONTROLS) -->
+            <!-- SELECTED PLAYER PLAYLIST -->
             <section id="player-playlist-view" class="card">
                 <div class="card-header">
                     <div>
@@ -841,7 +842,7 @@
                 </div>
             </section>
 
-            <!-- ALL PLAYLISTS VIEW (HIDDEN BY DEFAULT) -->
+            <!-- ALL PLAYLISTS VIEW -->
             <section id="playlists-view" class="card" style="display:none;">
                 <div class="card-header">
                     <div>
@@ -1090,10 +1091,8 @@
                 subtitle.textContent = `Active playlist set for player ${playerId}.`;
             }
 
-            // Refresh playlist package view
             fetchPlayerPlaylist(playerId);
 
-            // Update selector state
             if (playlistId === null) {
                 if (select) select.value = "";
             }
@@ -1545,7 +1544,7 @@
             }
 
             const data = await resp.json();
-            allPlaylistsCache = data; // keep cache in sync
+            allPlaylistsCache = data;
             renderPlaylists(data);
             playlistsLoadedOnce = true;
         } catch (err) {
