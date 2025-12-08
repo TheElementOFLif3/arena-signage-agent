@@ -1,22 +1,3 @@
-ArenaSignage – Dashboard & Player Agent
-
-Modern Raspberry Pi digital signage platform.
-
-This project contains:
-
-🖥️ Backend API (FastAPI + PostgreSQL)
-
-Handles players, playlists, items, assignment logic and effective playlist computation.
-
-🌐 Dashboard (HTML + JS + CSS)
-
-Web-based control panel with Tesla-style UI for managing signage devices and playlists.
-
-🍓 Player Agent (coming soon)
-
-Lightweight Raspberry Pi agent that downloads playlist items and displays them.
-
-
 <img width="1896" height="992" alt="SCR-20251207-pvrw" src="https://github.com/user-attachments/assets/8c0c27b1-bdc2-40af-aa2e-8cfc96ca8d4c" />
 <img width="1897" height="972" alt="SCR-20251207-pvpu" src="https://github.com/user-attachments/assets/e2dfc67d-aa8d-4025-9bb5-bdc502412dcf" />
 
